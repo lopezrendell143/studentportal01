@@ -14,23 +14,16 @@
         <header class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex justify-between items-center mb-8">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800">Welcome back, <span id="student-name">Student</span>!</h1>
-                <p class="text-slate-500 text-sm mt-1">Student Portal Active Exam</p>
+                <p class="text-slate-500 text-sm mt-1">Student Portal Active Exam Terminal Session</p>
             </div>
-            <button onclick="logout()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition-colors">Log Out</button>
-            <header class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex justify-between items-center mb-8">
-    <div>
-        <h1 class="text-2xl font-bold text-slate-800">Welcome back, <span id="student-name">Student</span>!</h1>
-        <p class="text-slate-500 text-sm mt-1">Student Portal Active Exam Terminal Session</p>
-    </div>
-    <div class="flex items-center gap-3">
-        <a href="add_face.html" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5">
-            📸 Setup Fast Login
-        </a>
-        <button onclick="logout()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
-            Log Out
-        </button>
-    </div>
-</header>
+            <div class="flex items-center gap-3">
+                <a href="add_face.html" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5">
+                    📸 Setup Fast Login
+                </a>
+                <button onclick="logout()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
+                    Log Out
+                </button>
+            </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -75,7 +68,9 @@
     <script>
         document.getElementById('student-name').textContent = localStorage.getItem('user_name') || 'Student';
         const databaseRoot = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app";
-        const cleanSafeEmailKey = (localStorage.getItem('user_email') || 'unknown').replace(/[\.@]/g, '_');
+        
+        // 🔑 FIXED: Using the active database username key (e.g., student01) for clean indexing
+        const userDbKey = (localStorage.getItem('user_email') || 'unknown').replace(/[\.@]/g, '_');
         
         let localExamsObject = {};
         let userPastSubmissions = {};
@@ -88,7 +83,6 @@
         async function fetchAvailableExams() {
             const tray = document.getElementById('exam-list');
             try {
-                // Fetch Exams and existing Student Submissions at the same time
                 const [resExams, resResults] = await Promise.all([
                     fetch(`${databaseRoot}/Exams.json`),
                     fetch(`${databaseRoot}/Results.json`)
@@ -101,8 +95,8 @@
                 
                 if (Object.keys(localExamsObject).length > 0) {
                     for (const [id, data] of Object.entries(localExamsObject)) {
-                        // Check if this specific student has already taken this specific exam
-                        const lookupKey = `${cleanSafeEmailKey}_${id}`;
+                        // Check if this specific student key has already logged an entry for this exam
+                        const lookupKey = `${userDbKey}_${id}`;
                         const alreadyTaken = userPastSubmissions[lookupKey] !== undefined;
 
                         if (alreadyTaken) {
@@ -129,8 +123,7 @@
         }
 
         function startExamSession(examId) {
-            // Extra safety gate verification check
-            const lookupKey = `${cleanSafeEmailKey}_${examId}`;
+            const lookupKey = `${userDbKey}_${examId}`;
             if (userPastSubmissions[lookupKey]) {
                 alert("Security block: records indicate this resource has already been submitted.");
                 window.location.reload();
@@ -246,7 +239,7 @@
             };
 
             try {
-                const uniqueSubmissionKey = `${cleanSafeEmailKey}_${currentLoadedExamId}`;
+                const uniqueSubmissionKey = `${userDbKey}_${currentLoadedExamId}`;
                 await fetch(`${databaseRoot}/Results/${uniqueSubmissionKey}.json`, {
                     method: 'PUT',
                     body: JSON.stringify(resultsPayload)
@@ -279,4 +272,3 @@
         fetchAvailableExams();
     </script>
 </body>
-</html>
