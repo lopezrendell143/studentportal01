@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Admin Dashboard & Exam Creator</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 min-h-screen flex">
@@ -18,7 +18,7 @@
         <div>
             <h2 class="text-xl font-bold tracking-wider mb-8 text-indigo-400">PORTAL ADMIN</h2>
             <nav class="space-y-2">
-                <a href="#" class="block bg-slate-800 px-4 py-2.5 rounded-lg font-medium text-white">Overview</a>
+                <a href="#" class="block bg-slate-800 px-4 py-2.5 rounded-lg font-medium text-white">Overview & Exams</a>
             </nav>
         </div>
         <button onclick="logout()" class="w-full text-center bg-red-600/25 hover:bg-red-600 text-red-400 hover:text-white font-medium py-2 rounded-lg transition-colors block">
@@ -34,7 +34,7 @@
 
         <div id="alert-box" class="hidden p-4 rounded-xl text-sm mb-6 border"></div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
             <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">Create Student Account</h3>
                 <form id="create-student-form" class="space-y-4">
@@ -56,9 +56,9 @@
                 </form>
             </section>
 
-            <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:col-span-2">
+            <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 xl:col-span-2">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">Live Firebase Accounts (`/Users`)</h3>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-64">
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr class="border-b border-slate-200 text-slate-400 text-sm font-medium">
@@ -68,8 +68,76 @@
                                 <th class="pb-3">Password</th>
                             </tr>
                         </thead>
-                        <tbody id="users-table-body" class="text-slate-600 text-sm divide-y divide-slate-100">
-                            </tbody>
+                        <tbody id="users-table-body" class="text-slate-600 text-sm divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
+                <h3 class="text-lg font-bold text-slate-800 mb-2">Create New Exam</h3>
+                <p class="text-xs text-slate-400 mb-4">Add a structured multi-choice single-question quiz</p>
+                
+                <form id="create-exam-form" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Exam ID Code Key</label>
+                        <input type="text" id="exam-id" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none focus:border-indigo-500" placeholder="quiz_01">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Timer Duration (Minutes)</label>
+                        <input type="number" id="exam-timer" min="1" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none focus:border-indigo-500" placeholder="10">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Question Prompt Text</label>
+                        <input type="text" id="exam-question" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none focus:border-indigo-500" placeholder="What is 5 + 5?">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Choice A</label>
+                            <input type="text" id="choice-a" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none focus:border-indigo-500" placeholder="8">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Choice B</label>
+                            <input type="text" id="choice-b" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none focus:border-indigo-500" placeholder="10">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Choice C</label>
+                            <input type="text" id="choice-c" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none focus:border-indigo-500" placeholder="12">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Choice D</label>
+                            <input type="text" id="choice-d" required class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none focus:border-indigo-500" placeholder="15">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Correct Choice Key</label>
+                        <select id="correct-choice" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-sm outline-none focus:border-indigo-500 bg-white">
+                            <option value="A">Choice A</option>
+                            <option value="B" selected>Choice B</option>
+                            <option value="C">Choice C</option>
+                            <option value="D">Choice D</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium py-2 rounded-lg text-sm transition-colors shadow-md">
+                        Deploy Exam to Firebase
+                    </button>
+                </form>
+            </section>
+
+            <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 xl:col-span-2">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Live Exam Nodes Tree (`/Exams`)</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-400 text-sm font-medium">
+                                <th class="pb-3">Exam ID</th>
+                                <th class="pb-3">Timer Length</th>
+                                <th class="pb-3">Question Text</th>
+                                <th class="pb-3">Correct Key</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exams-table-body" class="text-slate-600 text-sm divide-y divide-slate-100"></tbody>
                     </table>
                 </div>
             </section>
@@ -78,25 +146,21 @@
 
     <script>
         document.getElementById('admin-display-name').textContent = localStorage.getItem('user_name') || 'Admin';
-        const baseUrl = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users.json";
+        
+        const databaseRoot = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app";
+        const alertBox = document.getElementById('alert-box');
 
-        // Fetch and load database directory records
+        // Fetch Users Profile Data
         async function loadAccounts() {
             const tbody = document.getElementById('users-table-body');
-            tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">Loading live user database...</td></tr>`;
-            
             try {
-                const response = await fetch(baseUrl);
+                const response = await fetch(`${databaseRoot}/Users.json`);
                 const users = await response.json();
                 tbody.innerHTML = '';
-
                 if (users) {
                     for (const [nodeId, info] of Object.entries(users)) {
                         let displayEmail = info.email ? info.email : 'N/A';
-                        if (!displayEmail.includes('@') && displayEmail !== 'N/A') {
-                            displayEmail += '@gmail.com';
-                        }
-
+                        if (!displayEmail.includes('@') && displayEmail !== 'N/A') displayEmail += '@gmail.com';
                         tbody.innerHTML += `
                             <tr>
                                 <td class="py-3 font-mono text-xs font-semibold text-indigo-600">${nodeId}</td>
@@ -106,60 +170,98 @@
                             </tr>
                         `;
                     }
-                } else {
-                    tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No records found.</td></tr>`;
                 }
-            } catch (error) {
-                tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-500">Error fetching from Firebase.</td></tr>`;
-            }
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="4">Error Loading.</td></tr>'; }
         }
 
-        // Automatic Account Registration sync handler
+        // Fetch Active Exam Records
+        async function loadExams() {
+            const tbody = document.getElementById('exams-table-body');
+            tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">Syncing live exam logs...</td></tr>`;
+            try {
+                const response = await fetch(`${databaseRoot}/Exams.json`);
+                const exams = await response.json();
+                tbody.innerHTML = '';
+                if (exams) {
+                    for (const [id, data] of Object.entries(exams)) {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td class="py-3 font-mono text-xs font-semibold text-emerald-600">${id}</td>
+                                <td class="py-3 font-medium">${data.duration_minutes} Mins</td>
+                                <td class="py-3 text-slate-700 truncate max-w-xs">${data.question}</td>
+                                <td class="py-3 font-bold text-center text-indigo-600">${data.correct_answer}</td>
+                            </tr>
+                        `;
+                    }
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-slate-400">No active tests running. Use creator box.</td></tr>`;
+                }
+            } catch (e) { tbody.innerHTML = '<tr><td colspan="4">Error listing tests.</td></tr>'; }
+        }
+
+        // Register Student Submit Event
         document.getElementById('create-student-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const name = document.getElementById('student-name').value.trim();
             const email = document.getElementById('student-email').value.trim();
             const password = document.getElementById('student-password').value.trim();
-            const alertBox = document.getElementById('alert-box');
-
             const customNodeId = "student_" + email.replace(/[\.@]/g, '_');
-            const targetUrl = `https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users/${customNodeId}.json`;
 
-            const payload = {
-                "Full name": name,
-                "email": email.replace('@gmail.com', ''),
-                "password": password
+            try {
+                const response = await fetch(`${databaseRoot}/Users/${customNodeId}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ "Full name": name, "email": email.replace('@gmail.com', ''), "password": password })
+                });
+                if (response.ok) {
+                    showNotification("Student account cleanly synced to Firebase!", "emerald");
+                    document.getElementById('create-student-form').reset();
+                    loadAccounts();
+                }
+            } catch (err) { showNotification("Failed syncing profile.", "red"); }
+        });
+
+        // Add New Exam Submit Event
+        document.getElementById('create-exam-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const examId = document.getElementById('exam-id').value.trim().replace(/[^a-zA-Z0-9_]/g, '');
+            const duration = parseInt(document.getElementById('exam-timer').value);
+            const question = document.getElementById('exam-question').value.trim();
+            const a = document.getElementById('choice-a').value.trim();
+            const b = document.getElementById('choice-b').value.trim();
+            const c = document.getElementById('choice-c').value.trim();
+            const d = document.getElementById('choice-d').value.trim();
+            const correct = document.getElementById('correct-choice').value;
+
+            const examPayload = {
+                duration_minutes: duration,
+                question: question,
+                choices: { A: a, B: b, C: c, D: d },
+                correct_answer: correct
             };
 
             try {
-                const response = await fetch(targetUrl, {
+                const response = await fetch(`${databaseRoot}/Exams/${examId}.json`, {
                     method: 'PUT',
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(examPayload)
                 });
-
                 if (response.ok) {
-                    alertBox.className = "bg-emerald-50 text-emerald-600 p-4 rounded-xl text-sm mb-6 border border-emerald-100";
-                    alertBox.textContent = "Account completely created and synced to Firebase in real time!";
-                    alertBox.classList.remove('hidden');
-                    document.getElementById('create-student-form').reset();
-                    loadAccounts(); // Triggers direct table update
-                } else {
-                    throw new Error();
+                    showNotification("Exam node safely pushed live to Firebase cloud!", "emerald");
+                    document.getElementById('create-exam-form').reset();
+                    loadExams();
                 }
-            } catch (error) {
-                alertBox.className = "bg-red-50 text-red-600 p-4 rounded-xl text-sm mb-6 border border-red-100";
-                alertBox.textContent = "Failed to sync account data with Firebase Cloud.";
-                alertBox.classList.remove('hidden');
-            }
-        }); // <-- Fixed missing closing block token context
+            } catch (err) { showNotification("Error injecting exam structure.", "red"); }
+        });
 
-        function logout() {
-            localStorage.clear();
-            window.location.href = 'index.html';
+        function showNotification(msg, color) {
+            alertBox.className = `p-4 rounded-xl text-sm mb-6 border bg-${color}-50 text-${color}-600 border-${color}-100`;
+            alertBox.textContent = msg;
+            alertBox.classList.remove('hidden');
         }
 
-        // Run data compilation layout immediately on runtime window startup
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        
         loadAccounts();
+        loadExams();
     </script>
 </body>
 </html>
