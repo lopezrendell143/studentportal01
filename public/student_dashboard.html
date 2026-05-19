@@ -16,11 +16,10 @@
                 <h1 class="text-2xl font-bold text-slate-800">Welcome back, <span id="student-name">Student</span>!</h1>
                 <p class="text-slate-500 text-sm mt-1">Student Portal Active Exam Terminal Session</p>
             </div>
-            <div class="flex items-center gap-3" id="biometric-nav-actions">
-                <div id="face-btn-wrapper" class="flex items-center gap-2">
-                    <span class="text-xs text-slate-400">Checking biometrics...</span>
-                </div>
-                
+            <div class="flex items-center gap-3">
+                <a href="add_face.html" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5">
+                    📸 Setup Fast Login
+                </a>
                 <button onclick="logout()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
                     Log Out
                 </button>
@@ -69,6 +68,8 @@
     <script>
         document.getElementById('student-name').textContent = localStorage.getItem('user_name') || 'Student';
         const databaseRoot = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app";
+        
+        // 🔑 FIXED: Using the active database username key (e.g., student01) for clean indexing
         const userDbKey = (localStorage.getItem('user_email') || 'unknown').replace(/[\.@]/g, '_');
         
         let localExamsObject = {};
@@ -78,51 +79,6 @@
         let currentQuestionIndex = 0;
         let countdownTimerReference = null;
         let studentAnswersRegistry = {}; 
-
-        // Check if user already setup their face profile lock
-        async function checkBiometricStatus() {
-            const wrapper = document.getElementById('face-btn-wrapper');
-            try {
-                const res = await fetch(`${databaseRoot}/Users/${userDbKey}.json`);
-                const userProfile = await res.json();
-
-                if (userProfile && userProfile.face_signature) {
-                    // Face already exists -> Lock button, provide option to clear if they explicitly click it
-                    wrapper.innerHTML = `
-                        <div class="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 px-3 py-2 rounded-xl">
-                            <span class="text-sm font-semibold text-emerald-700 flex items-center gap-1">🔒 Face Active</span>
-                            <button onclick="resetFacialVerification()" class="text-[11px] text-red-500 hover:text-red-700 font-bold ml-2 underline decoration-dotted">
-                                Reset
-                            </button>
-                        </div>
-                    `;
-                } else {
-                    // No face found -> Allow registration setup
-                    wrapper.innerHTML = `
-                        <a href="add_face.html" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-4 py-2 rounded-xl text-sm font-semibold transition-colors flex items-center gap-1.5">
-                            📸 Setup Fast Login
-                        </a>
-                    `;
-                }
-            } catch (e) {
-                wrapper.innerHTML = `<span class="text-xs text-red-500">Biometric check offline</span>`;
-            }
-        }
-
-        // Drop biometric arrays manually if student triggers a reset configuration
-        async function resetFacialVerification() {
-            if (confirm("Are you sure you want to remove your registered face biometric signature? You will have to use your standard password login until re-scanned.")) {
-                try {
-                    await fetch(`${databaseRoot}/Users/${userDbKey}/face_signature.json`, {
-                        method: 'DELETE'
-                    });
-                    alert("Facial recognition profile cleared successfully.");
-                    checkBiometricStatus();
-                } catch (err) {
-                    alert("Communication with database failed.");
-                }
-            }
-        }
 
         async function fetchAvailableExams() {
             const tray = document.getElementById('exam-list');
@@ -139,6 +95,7 @@
                 
                 if (Object.keys(localExamsObject).length > 0) {
                     for (const [id, data] of Object.entries(localExamsObject)) {
+                        // Check if this specific student key has already logged an entry for this exam
                         const lookupKey = `${userDbKey}_${id}`;
                         const alreadyTaken = userPastSubmissions[lookupKey] !== undefined;
 
@@ -231,7 +188,9 @@
             }
         }
 
-        function saveAnswerSelection(selectedChoiceKey) { studentAnswersRegistry[currentQuestionIndex] = selectedChoiceKey; }
+        function saveAnswerSelection(selectedChoiceKey) {
+            studentAnswersRegistry[currentQuestionIndex] = selectedChoiceKey;
+        }
 
         function navigateNextQuestion() {
             if (!studentAnswersRegistry[currentQuestionIndex]) {
@@ -255,6 +214,7 @@
         async function processExamEvaluation() {
             clearInterval(countdownTimerReference);
             const targetExam = localExamsObject[currentLoadedExamId];
+            
             let absoluteCorrectCount = 0;
             const totalQuestionsCount = examQuestionsArray.length;
 
@@ -298,7 +258,7 @@
                         <button onclick="window.location.reload()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-3 rounded-xl text-sm transition-all">Return to Selection Tray</button>
                     </div>
                 `;
-            } catch (err) { alert("Failed to submit results."); }
+            } catch (err) { alert("Failed to submit results. Please verify your connection."); }
         }
 
         function updateClockDisplay(seconds) {
@@ -309,10 +269,6 @@
         }
 
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-        
-        // Trigger setup metrics checks on load
-        checkBiometricStatus();
         fetchAvailableExams();
     </script>
 </body>
-</html>
