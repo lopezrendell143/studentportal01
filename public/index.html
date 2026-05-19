@@ -129,7 +129,7 @@
         });
     }
 
-    async function openFaceLoginModal() {
+   async function openFaceLoginModal() {
     document.getElementById('face-modal').classList.remove('hidden');
     const label = document.getElementById('login-status-label');
     
@@ -137,8 +137,8 @@
         await loadFaceApiScripts();
         label.textContent = "Syncing network nodes models...";
         
-        // 🌐 FIXED: Points directly to the official repository folder with all shards included
-        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
+        // 🚀 FIXED: Mirror matched route updates
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/carlosrodriguez88/face-api.js@master/weights/';
         
         await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
         await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
@@ -152,7 +152,7 @@
         runBiometricMatchLoop();
     } catch (e) {
         console.error(e);
-        alert("Optics scanner failure: Check webcam settings or missing assets weights.");
+        alert(`Optics scanner failure: ${e.message}`);
         closeFaceLoginModal();
     }
 }

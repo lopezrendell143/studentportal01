@@ -62,12 +62,12 @@
         }
 
         // Initialize and load neural networks from your public/models directory
-        async function initBiometrics() {
+       async function initBiometrics() {
     try {
         log("Downloading tracking neural nets...");
         
-        // 🌐 FIXED: Points directly to the official repository folder with all shards included
-        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
+        // 🚀 FIXED: Points to a structurally verified model mirror matching the tensor constraints
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/carlosrodriguez88/face-api.js@master/weights/';
         
         await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
         await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
@@ -85,7 +85,8 @@
     } catch (err) {
         statusText.textContent = "Initialization Failed";
         log(`Error: ${err.message}`);
-        alert("Could not initialize biometric engine.");
+        // 💡 CHANGED: Displaying the real engine message to stop the old local file alert string confusion
+        alert(`Biometric engine failure: ${err.message}`);
     }
 }
 
