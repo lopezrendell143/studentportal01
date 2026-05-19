@@ -1,11 +1,11 @@
 <?php
 session_start();
 
+// Security check: Make sure the logged-in user is actually a student
 if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'student') {
     header("Location: login.php");
     exit();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -20,8 +20,8 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'student') {
     <div class="max-w-4xl mx-auto p-8">
         <div class="bg-white rounded-2xl p-8 shadow-md border border-slate-100 flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-bold text-slate-800">Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</h1>
-                <p class="text-slate-500 mt-1">Student Portal Dashboard Workspace</p>
+                <h1 class="text-3xl font-bold text-slate-800">Welcome back, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!</h1>
+                <p class="text-slate-500 mt-1">Logged in via Student Portal Workspace</p>
             </div>
             <a href="logout.php" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-xl text-sm font-medium transition-colors">
                 Log Out

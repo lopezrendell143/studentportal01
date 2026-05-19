@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// If someone is already logged in, send them straight to their dashboard
 if (isset($_SESSION['user_role'])) {
     header("Location: " . ($_SESSION['user_role'] === 'admin' ? "admin_dashboard.php" : "student_dashboard.php"));
     exit();
@@ -9,39 +10,50 @@ if (isset($_SESSION['user_role'])) {
 $error_message = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = trim($_POST['email']);
-    $password = trim($_POST['password']);
+    $email_input = trim($_POST['email']);
+    $password_input = trim($_POST['password']);
     
-    // Firebase paths cannot contain periods, so change 'rendell@gmail.com' to 'rendell@gmail_com'
-    $firebase_key = str_replace('.', '_', $email); 
+    // Determine which Firebase node to look at
+    $user_node = "";
+    if ($email_input === "admin@gmail.com") {
+        $user_node = "admin01";
+    } elseif ($email_input === "rendell@gmail.com") {
+        $user_node = "student01";
+    } else {
+        // For new students created by the admin, convert "test@gmail.com" to "student_test_gmail_com"
+        $user_node = "student_" . str_replace(['.', '@'], '_', $email_input);
+    }
 
-    // YOUR ACTUAL FIREBASE URL
-    $firebase_url = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/users/" . $firebase_key . ".json";
+    // Your exact Firebase URL targeting the user's specific path
+    $firebase_url = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users/" . $user_node . ".json";
 
-    // Call Firebase REST API
+    // Ask Firebase for this user's data
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $firebase_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Prevents SSL local host issues
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
     $response = curl_exec($ch);
     curl_close($ch);
 
     $user_data = json_decode($response, true);
 
-    if ($user_data !== null && isset($user_data['password']) && $user_data['password'] === $password) {
-        $_SESSION['user_email'] = $email;
-        $_SESSION['user_name'] = $user_data['name'];
-        $_SESSION['user_role'] = $user_data['role'];
+    // If the user exists and the password matches what's in Firebase
+    if ($user_data !== null && isset($user_data['password']) && $user_data['password'] === $password_input) {
+        $_SESSION['user_email'] = $email_input;
+        $_SESSION['user_name'] = $user_data['Full name'] ?? $user_data['name'] ?? "Student";
+        
+        // If the node name starts with 'admin', they are an admin. Otherwise, they are a student.
+        $_SESSION['user_role'] = (strpos($user_node, 'admin') !== false) ? 'admin' : 'student';
 
-        if ($user_data['role'] === 'admin') {
+        // Redirect to the correct dashboard
+        if ($_SESSION['user_role'] === 'admin') {
             header("Location: admin_dashboard.php");
         } else {
-            // Drop them into the student view
             header("Location: student_dashboard.php");
         }
         exit();
     } else {
-        $error_message = "Invalid email or password configuration.";
+        $error_message = "Invalid email or password connection.";
     }
 }
 ?>
@@ -70,11 +82,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form action="login.php" method="POST" class="space-y-5">
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                <input type="email" name="email" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                <input type="email" name="email" required placeholder="e.g., admin@gmail.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                <input type="password" name="password" required class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                <input type="password" name="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
             </div>
             <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-lg shadow-indigo-100">
                 Sign In
