@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Dashboard & Exam Terminal</title>
+    <title>EMS Student Portal - Exam Terminal</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -14,7 +14,7 @@
         }
     </script>
 
-    <div class="max-w-5xl mx-auto p-6">
+    <div class="max-w-6xl mx-auto p-6">
         <header class="bg-white rounded-2xl p-6 shadow-md border border-slate-100 flex justify-between items-center mb-8">
             <div>
                 <h1 class="text-2xl font-bold text-slate-800">Welcome back, <span id="student-name">Student</span>!</h1>
@@ -28,12 +28,14 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 h-fit">
                 <h3 class="text-lg font-bold text-slate-800 mb-3">Available Examinations</h3>
-                <p class="text-xs text-slate-400 mb-4">Pick a live test node key row below to initialize your secure session:</p>
+                <p class="text-xs text-slate-400 mb-4">Pick an active test deck below to initialize your exam session:</p>
                 <div id="exam-list" class="space-y-2">
-                    </div>
+                    <p class="text-sm text-slate-400 text-center py-2">Polling database nodes...</p>
+                </div>
             </div>
 
-            <div class="lg:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-[400px] flex flex-col justify-between" id="exam-terminal-desk">
+            <div class="lg:col-span-2 bg-white p-8 rounded-2xl shadow-sm border border-slate-200 min-h-[450px] flex flex-col justify-between" id="exam-terminal-desk">
+                
                 <div class="text-center my-auto text-slate-400" id="empty-state-notice">
                     <p class="text-lg font-medium">No Examination Loaded</p>
                     <p class="text-xs mt-1">Select an active exam container from the left tray deck to begin.</p>
@@ -41,22 +43,30 @@
                 
                 <div id="active-exam-container" class="hidden h-full flex flex-col justify-between space-y-6">
                     <div class="flex justify-between items-center border-b pb-4 border-slate-100">
-                        <h2 class="text-xl font-bold text-slate-800" id="live-exam-title">Exam</h2>
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800" id="live-exam-title">Exam Workspace</h2>
+                            <p class="text-xs text-indigo-600 font-semibold mt-0.5">Question <span id="current-q-index">1</span> of <span id="total-q-count">0</span></p>
+                        </div>
                         <div class="bg-red-50 border border-red-100 px-4 py-1.5 rounded-full text-red-600 font-mono font-bold text-sm flex items-center gap-1.5 animate-pulse">
                             ⏱️ <span id="timer-countdown">00:00</span>
                         </div>
                     </div>
 
-                    <div class="space-y-4 my-4">
-                        <p class="text-base font-semibold text-slate-800 bg-slate-50 p-4 rounded-xl border border-slate-100" id="live-question-text"></p>
+                    <div class="space-y-4 my-4 flex-1 justify-center flex flex-col">
+                        <p class="text-base font-semibold text-slate-800 bg-slate-50 p-5 rounded-xl border border-slate-100" id="live-question-text">
+                            Loading question prompt...
+                        </p>
                         <div class="grid grid-cols-1 gap-3" id="live-choices-deck">
                             </div>
                     </div>
 
-                    <button onclick="submitExam(false)" id="submit-exam-btn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition-all shadow-lg shadow-indigo-100 text-sm">
-                        Finalize & Submit Answers
-                    </button>
+                    <div class="pt-4 border-t border-slate-100 flex justify-end">
+                        <button onclick="navigateNextQuestion()" id="next-exam-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-8 py-3 rounded-xl transition-all shadow-lg shadow-indigo-100 text-sm">
+                            Next Question →
+                        </button>
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -65,60 +75,70 @@
         document.getElementById('student-name').textContent = localStorage.getItem('user_name') || 'Student';
         const databaseRoot = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app";
         
+        // Runtime Session Cache States
         let localExamsObject = {};
         let currentLoadedExamId = "";
+        let examQuestionsArray = [];
+        let currentQuestionIndex = 0;
         let countdownTimerReference = null;
-        let selectedAnswers = "";
+        
+        // Tracks answers checked by the student
+        let studentAnswersRegistry = {}; 
 
-        // Query Available Tests
+        // 1. Fetch available exams headers from database root
         async function fetchAvailableExams() {
             const tray = document.getElementById('exam-list');
-            tray.innerHTML = '<p class="text-sm text-slate-400 text-center py-2">Polling database nodes...</p>';
             try {
                 const response = await fetch(`${databaseRoot}/Exams.json`);
                 localExamsObject = await response.json() || {};
                 tray.innerHTML = '';
                 
                 if (Object.keys(localExamsObject).length > 0) {
-                    for (const id of Object.keys(localExamsObject)) {
+                    for (const [id, data] of Object.entries(localExamsObject)) {
                         tray.innerHTML += `
-                            <button onclick="startExamSession('${id}')" class="w-full text-left p-3.5 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/20 text-slate-700 font-medium text-sm transition-all flex justify-between items-center">
-                                <span>📝 ${id}</span>
-                                <span class="text-xs bg-slate-100 px-2 py-1 rounded text-slate-500">${localExamsObject[id].duration_minutes}m</span>
+                            <button onclick="startExamSession('${id}')" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-500 hover:bg-indigo-50/10 text-slate-700 font-medium text-sm transition-all flex justify-between items-center">
+                                <span>📝 ${data.title || id}</span>
+                                <span class="text-xs bg-slate-100 px-2.5 py-1 rounded text-slate-500 font-bold">${data.duration_minutes}m</span>
                             </button>
                         `;
                     }
-                } else { tray.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No tests deployed by admin.</p>'; }
-            } catch (e) { tray.innerHTML = '<p class="text-xs text-red-500">Syncing failed.</p>'; }
+                } else { 
+                    tray.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No examinations have been deployed by administration yet.</p>'; 
+                }
+            } catch (e) { tray.innerHTML = '<p class="text-xs text-red-500 text-center">Syncing data streams failed.</p>'; }
         }
 
-        // Initialize exam environment and countdown timers
+        // 2. Initialize exam structural sequence array
         function startExamSession(examId) {
             clearInterval(countdownTimerReference);
             currentLoadedExamId = examId;
             const targetExam = localExamsObject[examId];
 
-            document.getElementById('empty-state-notice').classList.add('hidden');
-            document.getElementById('active-exam-container').classList.remove('hidden');
-            document.getElementById('live-exam-title').textContent = `Exam: ${examId}`;
-            document.getElementById('live-question-text').textContent = targetExam.question;
-            document.getElementById('submit-exam-btn').disabled = false;
-            document.getElementById('submit-exam-btn').className = "w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl transition-all shadow-lg text-sm";
-
-            // Render Radio Inputs Choice Cards
-            const choicesDeck = document.getElementById('live-choices-deck');
-            choicesDeck.innerHTML = '';
-            for (const [key, text] of Object.entries(targetExam.choices)) {
-                choicesDeck.innerHTML += `
-                    <label class="flex items-center gap-3 p-3.5 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50/50 transition-colors">
-                        <input type="radio" name="quiz-choice" value="${key}" onclick="selectedAnswers = '${key}'" class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
-                        <span class="text-sm font-semibold text-slate-500">${key}.</span>
-                        <span class="text-sm text-slate-700 font-medium">${text}</span>
-                    </label>
-                `;
+            // Parse individual nested question components out into flat index structures
+            if (!targetExam.questions) {
+                alert("This examination template header contains no question banks yet. Contact your administrator.");
+                return;
             }
 
-            // Start Live Countdown Core Loop
+            // Convert nested Firebase map objects into an ordered array framework
+            examQuestionsArray = Object.entries(targetExam.questions).map(([key, value]) => ({
+                questionFirebaseId: key,
+                ...value
+            }));
+
+            currentQuestionIndex = 0;
+            studentAnswersRegistry = {};
+
+            // Update DOM workspace layouts
+            document.getElementById('empty-state-notice').classList.add('hidden');
+            document.getElementById('active-exam-container').classList.remove('hidden');
+            document.getElementById('live-exam-title').textContent = targetExam.title || examId;
+            document.getElementById('total-q-count').textContent = examQuestionsArray.length;
+            document.getElementById('next-exam-btn').textContent = examQuestionsArray.length === 1 ? "Submit Examination" : "Next Question →";
+
+            renderQuestionBlock();
+
+            // Run central continuous clock count thread
             let remainingSeconds = targetExam.duration_minutes * 60;
             updateClockDisplay(remainingSeconds);
 
@@ -127,10 +147,138 @@
                 updateClockDisplay(remainingSeconds);
                 if (remainingSeconds <= 0) {
                     clearInterval(countdownTimerReference);
-                    alert("Time is up! Your answer is submitting automatically.");
-                    submitExam(true); // Forced automation submission
+                    alert("Session timer collapsed! Submitting your marked answers immediately.");
+                    processExamEvaluation(); // Force completion save out
                 }
             }, 1000);
+        }
+
+        // 3. Render singular question map deck based on sequential loop pointer
+        function renderQuestionBlock() {
+            const currentQuestion = examQuestionsArray[currentQuestionIndex];
+            document.getElementById('current-q-index').textContent = currentQuestionIndex + 1;
+            document.getElementById('live-question-text').textContent = currentQuestion.question;
+
+            const choicesDeck = document.getElementById('live-choices-deck');
+            choicesDeck.innerHTML = '';
+
+            // Inject option fields elements mapping pointers dynamically
+            for (const [key, text] of Object.entries(currentQuestion.choices)) {
+                // Check if the user previously selected this answer (in case they move back/forth later)
+                const isChecked = studentAnswersRegistry[currentQuestionIndex] === key ? 'checked' : '';
+                
+                choicesDeck.innerHTML += `
+                    <label class="flex items-center gap-3 p-4 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-all">
+                        <input type="radio" name="quiz-choice" value="${key}" ${isChecked} 
+                            onclick="saveAnswerSelection('${key}')" 
+                            class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500">
+                        <span class="text-sm font-bold text-slate-400">${key}.</span>
+                        <span class="text-sm text-slate-700 font-medium">${text}</span>
+                    </label>
+                `;
+            }
+        }
+
+        // 4. Save answer state directly to local cache registry
+        function saveAnswerSelection(selectedChoiceKey) {
+            studentAnswersRegistry[currentQuestionIndex] = selectedChoiceKey;
+        }
+
+        // 5. Manage navigation clicking layout changes
+        function navigateNextQuestion() {
+            // Check if they skipped selecting an item
+            if (!studentAnswersRegistry[currentQuestionIndex]) {
+                if (!confirm("You haven't selected an option for this question. Proceed anyway?")) {
+                    return;
+                }
+                studentAnswersRegistry[currentQuestionIndex] = "No Answer Given";
+            }
+
+            if (currentQuestionIndex < examQuestionsArray.length - 1) {
+                currentQuestionIndex++;
+                renderQuestionBlock();
+                
+                // If moving onto the final step, morph the button label
+                if (currentQuestionIndex === examQuestionsArray.length - 1) {
+                    document.getElementById('next-exam-btn').textContent = "Submit Examination";
+                }
+            } else {
+                // Trigger compilation sequences
+                if (confirm("Are you sure you want to finalize and submit this examination?")) {
+                    processExamEvaluation();
+                }
+            }
+        }
+
+        // 6. Grade computation and push payload onto Realtime DB `/Results` route 
+        async function processExamEvaluation() {
+            clearInterval(countdownTimerReference);
+            const targetExam = localExamsObject[currentLoadedExamId];
+            
+            let absoluteCorrectCount = 0;
+            const totalQuestionsCount = examQuestionsArray.length;
+
+            // Iterate through every question checking metrics against answers structural data
+            examQuestionsArray.forEach((q, index) => {
+                const givenAnswer = studentAnswersRegistry[index];
+                if (givenAnswer === q.correct_answer) {
+                    absoluteCorrectCount++;
+                }
+            });
+
+            // Derive percentage distributions
+            const calculatedPercentageScore = Math.round((absoluteCorrectCount / totalQuestionsCount) * 100);
+            const minimumPassingRate = targetExam.passing_score || 75;
+            const finalExamOutcome = calculatedPercentageScore >= minimumPassingRate ? "PASSED" : "FAILED";
+
+            const cleanSafeEmailKey = (localStorage.getItem('user_email') || 'unknown').replace(/[\.@]/g, '_');
+            
+            const resultsPayload = {
+                student_name: localStorage.getItem('user_name') || 'Student',
+                exam_taken_id: currentLoadedExamId,
+                exam_title: targetExam.title || currentLoadedExamId,
+                score_raw: absoluteCorrectCount,
+                total_questions: totalQuestionsCount,
+                score_percentage: calculatedPercentageScore,
+                passing_rate_required: minimumPassingRate,
+                status: finalExamOutcome,
+                submitted_at: new Date().toLocaleString()
+            };
+
+            try {
+                // PUT transaction to specific indexed tree branch path
+                await fetch(`${databaseRoot}/Results/${cleanSafeEmailKey}_${currentLoadedExamId}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify(resultsPayload)
+                });
+
+                // Display dynamic grading scorecard canvas window blocks
+                const statusColor = finalExamOutcome === "PASSED" ? "emerald" : "red";
+                
+                document.getElementById('exam-terminal-desk').innerHTML = `
+                    <div class="my-auto text-center space-y-6 max-w-md mx-auto p-2">
+                        <div class="text-6xl"> ${finalExamOutcome === "PASSED" ? "🎉" : "❌"} </div>
+                        <div>
+                            <h2 class="text-2xl font-extrabold text-slate-800">Examination Concluded</h2>
+                            <p class="text-sm text-slate-400 mt-1">Your response logs have safely saved onto the admin register network nodes.</p>
+                        </div>
+                        
+                        <div class="p-6 rounded-2xl bg-${statusColor}-50 border border-${statusColor}-100 space-y-2">
+                            <span class="text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider bg-${statusColor}-500 text-white">
+                                ${finalExamOutcome}
+                            </span>
+                            <div class="text-4xl font-black text-slate-800 pt-2">${calculatedPercentageScore}%</div>
+                            <p class="text-xs font-semibold text-slate-500">Score: ${absoluteCorrectCount} out of ${totalQuestionsCount} correct</p>
+                        </div>
+
+                        <button onclick="window.location.reload()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-3 rounded-xl text-sm transition-all shadow-md">
+                            Return to Selection Tray
+                        </button>
+                    </div>
+                `;
+            } catch (err) { 
+                alert("Failed to submit result records to Firebase database streams. Check connection lines."); 
+            }
         }
 
         function updateClockDisplay(seconds) {
@@ -140,47 +288,9 @@
             display.textContent = `${mins}:${secs}`;
         }
 
-        // Score check evaluation and push to Firebase Results Node
-        async function submitExam(isForcedByTimeout = false) {
-            clearInterval(countdownTimerReference);
-            const targetExam = localExamsObject[currentLoadedExamId];
-            
-            let finalCalculatedScore = 0;
-            if (selectedAnswers === targetExam.correct_answer) {
-                finalCalculatedScore = 1;
-            }
-
-            const cleanSafeEmailKey = (localStorage.getItem('user_email') || 'unknown').replace(/[\.@]/g, '_');
-            const submissionPayload = {
-                student_name: localStorage.getItem('user_name') || 'Student',
-                exam_taken: currentLoadedExamId,
-                selected_answer: selectedAnswers || 'No Answer Given',
-                score: finalCalculatedScore,
-                total_questions: 1,
-                submitted_at: new Date().toLocaleString()
-            };
-
-            try {
-                // Save directly to Firebase Realtime Database
-                await fetch(`${databaseRoot}/Results/${cleanSafeEmailKey}_${currentLoadedExamId}.json`, {
-                    method: 'PUT',
-                    body: JSON.stringify(submissionPayload)
-                });
-
-                // Lock workspace display to confirm grade save safely
-                document.getElementById('live-choices-deck').innerHTML = `
-                    <div class="bg-indigo-50/50 border border-indigo-100 p-6 rounded-2xl text-center space-y-2">
-                        <p class="text-2xl font-bold text-indigo-600">Exam Concluded 🎉</p>
-                        <p class="text-sm text-slate-600 font-medium">Your score has been successfully saved to your profile tree node!</p>
-                        <div class="text-lg font-bold text-slate-700 pt-2">Your Score: ${finalCalculatedScore} / 1</div>
-                    </div>
-                `;
-                document.getElementById('submit-exam-btn').disabled = true;
-                document.getElementById('submit-exam-btn').className = "w-full bg-slate-300 text-slate-500 font-medium py-3 rounded-xl cursor-not-allowed text-sm";
-            } catch (err) { alert("Failed to log results with cloud data network."); }
-        }
-
         function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        
+        // Fire up execution
         fetchAvailableExams();
     </script>
 </body>
