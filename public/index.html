@@ -137,8 +137,8 @@
         await loadFaceApiScripts();
         label.textContent = "Syncing network nodes models...";
         
-        // 🌐 CHANGED: Pulling weights directly from a public verified CDN mirror
-        const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights/';
+        // 🌐 FIXED: Points directly to the official repository folder with all shards included
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
         
         await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
         await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
@@ -151,75 +151,81 @@
         label.textContent = "Scanning... Hold still";
         runBiometricMatchLoop();
     } catch (e) {
-        console.error(e); // Logs the exact error message to your browser console
+        console.error(e);
         alert("Optics scanner failure: Check webcam settings or missing assets weights.");
         closeFaceLoginModal();
     }
 }
 
     async function runBiometricMatchLoop() {
-        const videoElement = document.getElementById('login-webcam');
-        const label = document.getElementById('login-status-label');
+    const videoElement = document.getElementById('login-webcam');
+    const label = document.getElementById('login-status-label');
+    
+    if (!loginStreamInstance) return;
+
+    const snapshot = await faceapi.detectSingleFace(videoElement)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+    if (snapshot) {
+        label.textContent = "Comparing face signature against global records...";
         
-        if (!loginStreamInstance) return;
-
-        // Extract immediate face snapshot descriptor vectors
-        const snapshot = await faceapi.detectSingleFace(videoElement)
-            .withFaceLandmarks()
-            .withFaceDescriptor();
-
-        if (snapshot) {
-            label.textContent = "Comparing face signature against global records...";
+        try {
+            const response = await fetch(`${dbRoot}/Users.json`);
+            const userTree = await response.json() || {};
             
-            try {
-                // Pull whole user database list values array
-                const response = await fetch(`${dbRoot}/Users.json`);
-                const userTree = await response.json() || {};
-                
-                let bestMatchUser = null;
-                let lowestDistanceThreshold = 0.6; // Values under 0.6 indicate a match (lower means closer match)
+            let bestMatchUser = null;
+            let lowestDistanceThreshold = 0.6; // Distances under 0.6 match profiles
+            let totalRegisteredFaces = 0;
 
-                for (const [nodeId, userProfile] of Object.entries(userTree)) {
-                    if (userProfile.face_signature) {
-                        // Reconstruct array float points matrix
-                        const savedSignatureVector = new Float32Array(userProfile.face_signature);
-                        // Calculate Euclidean Vector distance variance delta
-                        const structuralDistance = faceapi.euclideanDistance(snapshot.descriptor, savedSignatureVector);
-                        
-                        if (structuralDistance < lowestDistanceThreshold) {
-                            lowestDistanceThreshold = structuralDistance;
-                            bestMatchUser = {
-                                uid: nodeId,
-                                name: userProfile["Full name"] || "User",
-                                role: userProfile.role || "student",
-                                email: userProfile.email ? (userProfile.email.includes('@') ? userProfile.email : userProfile.email + '@gmail.com') : 'N/A'
-                            };
-                        }
+            for (const [nodeId, userProfile] of Object.entries(userTree)) {
+                if (userProfile.face_signature) {
+                    totalRegisteredFaces++;
+                    const savedSignatureVector = new Float32Array(userProfile.face_signature);
+                    const structuralDistance = faceapi.euclideanDistance(snapshot.descriptor, savedSignatureVector);
+                    
+                    if (structuralDistance < lowestDistanceThreshold) {
+                        lowestDistanceThreshold = structuralDistance;
+                        bestMatchUser = {
+                            uid: nodeId,
+                            name: userProfile["Full name"] || "User",
+                            role: userProfile.role || "student",
+                            email: userProfile.email || 'N/A'
+                        };
                     }
                 }
+            }
 
-                if (bestMatchUser) {
-                    label.textContent = `Match Found! Welcome ${bestMatchUser.name}`;
-                    // Set credentials to mirror standard input logins
-                    localStorage.setItem('user_role', bestMatchUser.role);
-                    localStorage.setItem('user_name', bestMatchUser.name);
-                    localStorage.setItem('user_email', bestMatchUser.email);
-                    
-                    setTimeout(() => {
-                        closeFaceLoginModal();
-                        if (bestMatchUser.role === 'admin') window.location.href = 'admin_dashboard.html';
-                        else window.location.href = 'student_dashboard.html';
-                    }, 1000);
-                    return; // Break tracking cycle loop
-                }
-            } catch (err) { console.error("Database mismatch execution cross checks dropped:", err); }
-        }
+            // 💡 FIX HERE: Inform them immediately if nobody has registered biometrics yet
+            if (totalRegisteredFaces === 0) {
+                label.innerHTML = `<span class="text-red-500 font-semibold">❌ No biometric records found. Please sign in with your password first and register your face!</span>`;
+                return; 
+            }
 
-        // Loop execution scanning context continuously every 700ms if no matches intersect
-        setTimeout(() => {
-            if (loginStreamInstance) runBiometricMatchLoop();
-        }, 700);
+            if (bestMatchUser) {
+                label.textContent = `Match Found! Welcome ${bestMatchUser.name}`;
+                localStorage.setItem('user_role', bestMatchUser.role);
+                localStorage.setItem('user_name', bestMatchUser.name);
+                localStorage.setItem('user_email', bestMatchUser.email);
+                
+                setTimeout(() => {
+                    closeFaceLoginModal();
+                    if (bestMatchUser.role === 'admin') window.location.href = 'admin_dashboard.html';
+                    else window.location.href = 'student_dashboard.html';
+                }, 1000);
+                return;
+            } else {
+                // Face detected but doesn't match any registered user signatures
+                label.innerHTML = `<span class="text-amber-600 font-semibold">🔍 Face not recognized. Make sure you are registered or try adjusting your lighting.</span>`;
+            }
+        } catch (err) { console.error("Database mismatch execution cross checks dropped:", err); }
     }
+
+    // Keep loop active
+    setTimeout(() => {
+        if (loginStreamInstance) runBiometricMatchLoop();
+    }, 700);
+}
 
     function closeFaceLoginModal() {
         if (loginStreamInstance) {

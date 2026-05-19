@@ -66,8 +66,8 @@
     try {
         log("Downloading tracking neural nets...");
         
-        // 🌐 CHANGED: Using the cloud CDN path here too
-        const MODEL_URL = 'https://raw.githubusercontent.com/justadudewhohacks/face-api.js/master/weights/';
+        // 🌐 FIXED: Points directly to the official repository folder with all shards included
+        const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@master/weights/';
         
         await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
         await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
