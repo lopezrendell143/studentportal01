@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EMS Admin - Manage Exams</title>
+    <title>PORTAL Admin - Manage Exams</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 min-h-screen flex">
@@ -12,19 +12,19 @@
 
     <aside class="w-64 bg-slate-900 text-white p-6 flex flex-col justify-between shrink-0 hidden md:flex">
         <div>
-            <h2 class="text-xl font-bold tracking-wider mb-8 text-indigo-400 flex items-center gap-2"><span>🛡️</span> EMS ADMIN</h2>
+            <h2 class="text-xl font-bold tracking-wider mb-8 text-indigo-400 flex items-center gap-2"><span>🛡️</span> PORTAL ADMIN</h2>
             <nav class="space-y-1.5">
                 <a href="admin_dashboard.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 text-slate-400">📊 Overview Dashboard</a>
                 <a href="add_student.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 text-slate-400">👤 Add New Student</a>
                 <a href="manage_exams.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all bg-indigo-600 text-white shadow-md shadow-indigo-900/20">📝 Manage Examinations</a>
             </nav>
         </div>
-        <button onclick="logout()" class="w-full text-center bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white font-medium py-2.5 rounded-xl text-sm transition-all block border border-red-500/20">Log Out Session</button>
+        <button onclick="logout()" class="w-full text-center bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white font-medium py-2.5 rounded-xl text-sm transition-all block border border-red-500/20">Log Out</button>
     </aside>
 
     <main id="main-dashboard-view" class="flex-1 p-8">
         <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-            <h1 class="text-2xl font-bold text-slate-800">Exam Management Workspace</h1>
+            <h1 class="text-2xl font-bold text-slate-800">Exam Management</h1>
             <span class="text-sm font-medium text-slate-600">Logged in as: <strong>Admin</strong></span>
         </header>
 
@@ -80,7 +80,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <section class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-fit">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Insert Question Form</h3>
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Insert Question</h3>
                 <form id="add-question-form" class="space-y-4">
                     <div>
                         <label class="block text-xs font-medium text-slate-500 uppercase mb-1">Question Text</label>
@@ -103,7 +103,7 @@
             </section>
 
             <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:col-span-2">
-                <h3 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b">Question Bank Bank List</h3>
+                <h3 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b">Questions</h3>
                 <div class="space-y-4 max-h-[500px] overflow-y-auto" id="question-bank-list"></div>
             </section>
         </div>
