@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Student Portal</h1>
+            <p class="text-slate-500 mt-2">Sign in to your account</p>
+        </div>
+
+        <div id="error-box" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center mb-5 border border-red-100"></div>
+
+        <form id="login-form" class="space-y-5">
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                <input type="email" id="email" required placeholder="admin@gmail.com or rendell@gmail.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+            </div>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-lg shadow-indigo-100">
+                Sign In
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const emailInput = document.getElementById('email').value.trim();
+            const passwordInput = document.getElementById('password').value.trim();
+            const errorBox = document.getElementById('error-box');
+            
+            errorBox.classList.add('hidden');
+
+            // Determine the Firebase key mapping
+            let userNode = "";
+            if (emailInput === "admin@gmail.com") {
+                userNode = "admin01";
+            } else if (emailInput === "rendell@gmail.com") {
+                userNode = "student01";
+            } else {
+                // Matches the auto-generated structure for newly created students
+                userNode = "student_" + emailInput.replace(/[\.@]/g, '_');
+            }
+
+            // Your exact Singapore database URL targeting the specific node
+            const url = `https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users/${userNode}.json`;
+
+            try {
+                const response = await fetch(url);
+                const userData = await response.json();
+
+                if (userData && userData.password === passwordInput) {
+                    // Store user session variables locally in the browser
+                    localStorage.setItem('user_email', emailInput);
+                    localStorage.setItem('user_name', userData['Full name'] || userData['name'] || "User");
+                    
+                    // Route user roles based on node signature
+                    if (userNode.includes('admin')) {
+                        localStorage.setItem('user_role', 'admin');
+                        window.location.href = 'admin_dashboard.html';
+                    } else {
+                        localStorage.setItem('user_role', 'student');
+                        window.location.href = 'student_dashboard.html';
+                    }
+                } else {
+                    errorBox.textContent = "Invalid email or password.";
+                    errorBox.classList.remove('hidden');
+                }
+            } catch (error) {
+                errorBox.textContent = "Error connecting to Firebase Realtime Database.";
+                errorBox.classList.remove('hidden');
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>
