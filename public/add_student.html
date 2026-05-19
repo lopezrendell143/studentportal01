@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS Admin - Student Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex">
+
+    <script>if (localStorage.getItem('user_role') !== 'admin') { window.location.href = 'index.html'; }</script>
+
+    <aside class="w-64 bg-slate-900 text-white p-6 flex flex-col justify-between shrink-0 hidden md:flex">
+        <div>
+            <h2 class="text-xl font-bold tracking-wider mb-8 text-indigo-400 flex items-center gap-2"><span>🛡️</span> EMS ADMIN</h2>
+            <nav class="space-y-1.5">
+                <a href="admin_dashboard.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 text-slate-400">📊 Overview Dashboard</a>
+                <a href="add_student.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all bg-indigo-600 text-white shadow-md shadow-indigo-900/20">👤 Add New Student</a>
+                <a href="manage_exams.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 text-slate-400">📝 Manage Examinations</a>
+            </nav>
+        </div>
+        <button onclick="logout()" class="w-full text-center bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white font-medium py-2.5 rounded-xl text-sm transition-all block border border-red-500/20">Log Out Session</button>
+    </aside>
+
+    <main class="flex-1 p-8">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <h1 class="text-2xl font-bold text-slate-800">Student Account Registration Desk</h1>
+            <span class="text-sm font-medium text-slate-600">Logged in as: <strong>Admin</strong></span>
+        </header>
+
+        <div id="alert-box" class="hidden p-4 rounded-xl text-sm mb-6 border"></div>
+
+        <div class="max-w-xl bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+            <h3 class="text-lg font-bold text-slate-800 mb-2">Create Student Account Node</h3>
+            <p class="text-slate-400 text-xs mb-6">Pushes a verified profile record onto your active user tree schema.</p>
+
+            <form id="create-student-form" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Full Legal Name</label>
+                    <input type="text" id="student-name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-indigo-500 transition-colors" placeholder="Jane Doe">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Email Address</label>
+                    <input type="email" id="student-email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-indigo-500 transition-colors" placeholder="jane@gmail.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 tracking-wider mb-1.5">Secure Password String</label>
+                    <input type="password" id="student-password" required class="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm outline-none focus:border-indigo-500 transition-colors" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl text-sm transition-all shadow-lg shadow-indigo-100">
+                    Inject Student Account into Firebase
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const databaseRoot = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app";
+        const alertBox = document.getElementById('alert-box');
+
+        document.getElementById('create-student-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('student-name').value.trim();
+            const email = document.getElementById('student-email').value.trim();
+            const password = document.getElementById('student-password').value.trim();
+            const customNodeId = "student_" + email.replace(/[\.@]/g, '_');
+
+            try {
+                const response = await fetch(`${databaseRoot}/Users/${customNodeId}.json`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ "Full name": name, "email": email.replace('@gmail.com', ''), "password": password, "role": "student" })
+                });
+                if (response.ok) {
+                    showAlert("Student database node generated successfully!", "emerald");
+                    document.getElementById('create-student-form').reset();
+                }
+            } catch (err) { showAlert("Failed syncing user properties.", "red"); }
+        });
+
+        function showAlert(msg, color) {
+            alertBox.className = `p-4 rounded-xl text-sm mb-6 border bg-${color}-50 text-${color}-600 border-${color}-100`;
+            alertBox.textContent = msg;
+            alertBox.classList.remove('hidden');
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+    </script>
+</body>
+</html>
