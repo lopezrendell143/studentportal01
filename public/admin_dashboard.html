@@ -1,157 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Admin - Dashboard Overview</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Admin - Dashboard Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-50 min-h-screen flex overflow-hidden">
+<body class="bg-slate-100 min-h-screen flex">
 
-    <script>if (localStorage.getItem('user_role') !== 'admin') { window.location.href = 'index.html'; }</script>
+    <script>if (localStorage.getItem('user_role') !== 'admin') { window.location.href = 'index.html'; }</script>
 
-        <aside class="w-64 bg-slate-900 text-white p-6 flex flex-col justify-between shrink-0 hidden md:flex h-screen sticky top-0 left-0 shadow-lg">
-        <div>
-            <h2 class="text-lg font-bold tracking-wider mb-8 text-indigo-400 flex items-center gap-2"><span>🛡️</span> PORTAL ADMIN</h2>
-            <nav class="space-y-1">
-                <a href="admin_dashboard.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm bg-indigo-600 text-white shadow-md">📊 Overview Dashboard</a>
-                <a href="add_student.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-slate-800 text-slate-400 transition-colors">👤 Add New Student</a>
-                <a href="manage_exams.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm hover:bg-slate-800 text-slate-400 transition-colors">📝 Manage Examinations</a>
-            </nav>
-        </div>
-        <button onclick="logout()" class="w-full text-center bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white font-medium py-2.5 rounded-xl text-sm transition-all block border border-red-500/20">Log Out </button>
-    </aside>
+    <aside class="w-64 bg-slate-900 text-white p-6 flex flex-col justify-between shrink-0 hidden md:flex">
+        <div>
+            <h2 class="text-xl font-bold tracking-wider mb-8 text-indigo-400 flex items-center gap-2"><span>🛡️</span> PORTAL ADMIN</h2>
+            <nav class="space-y-1.5">
+                <a href="admin_dashboard.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all bg-indigo-600 text-white shadow-md shadow-indigo-900/20">📊 Overview Dashboard</a>
+                <a href="add_student.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 text-slate-400">👤 Add New Student</a>
+                <a href="manage_exams.html" class="flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium text-sm transition-all hover:bg-slate-800 text-slate-400">📝 Manage Examinations</a>
+            </nav>
+        </div>
+        <button onclick="logout()" class="w-full text-center bg-red-600/10 hover:bg-red-600 text-red-400 hover:text-white font-medium py-2.5 rounded-xl text-sm transition-all block border border-red-500/20">Log Out </button>
+    </aside>
 
-        <main class="flex-1 p-8 overflow-y-auto h-screen">
-        <header class="flex justify-between items-center mb-8 bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-            <h1 class="text-2xl font-bold text-slate-800">Admin Central Hub</h1>
-            <span class="text-sm font-medium text-slate-600">Active User: <strong id="admin-display-name" class="text-indigo-600">Admin</strong></span>
-        </header>
+    <main class="flex-1 p-8">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <h1 class="text-2xl font-bold text-slate-800">Admin Central Hub</h1>
+            <span class="text-sm font-medium text-slate-600">Active User: <strong id="admin-display-name">Admin</strong></span>
+        </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                <div>
-                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Registered Users</p>
-                    <h3 class="text-3xl font-extrabold text-slate-800 mt-1" id="stat-users">0</h3>
-                </div>
-                <div class="p-3 rounded-xl bg-indigo-50 text-indigo-600 font-bold text-xl">👥</div>
-            </div>
-            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex justify-between items-center">
-                <div>
-                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Active Exams Deployed</p>
-                    <h3 class="text-3xl font-extrabold text-slate-800 mt-1" id="stat-exams">0</h3>
-                </div>
-                <div class="p-3 rounded-xl bg-emerald-50 text-emerald-600 font-bold text-xl">📝</div>
-            </div>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Registered Users</p>
+                    <h3 class="text-3xl font-extrabold text-slate-800 mt-1" id="stat-users">0</h3>
+                </div>
+                <div class="p-3 rounded-xl bg-indigo-50 text-indigo-600 font-bold text-xl">👥</div>
+            </div>
+            <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm flex justify-between items-center">
+                <div>
+                    <p class="text-xs font-bold uppercase text-slate-400 tracking-wider">Active Exams Deployed</p>
+                    <h3 class="text-3xl font-extrabold text-slate-800 mt-1" id="stat-exams">0</h3>
+                </div>
+                <div class="p-3 rounded-xl bg-emerald-50 text-emerald-600 font-bold text-xl">📝</div>
+            </div>
+        </div>
 
-        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 mb-8">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Recent Exam Submissions</h3>
-            <div class="overflow-x-auto rounded-xl border border-slate-100">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                            <th class="p-4 py-3">Student</th>
-                            <th class="p-4 py-3">Exam</th>
-                            <th class="p-4 py-3">Score</th>
-                            <th class="p-4 py-3">Status</th>
-                            <th class="p-4 py-3">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody id="submissions-table-body" class="text-slate-600 text-sm divide-y divide-slate-100 bg-white">
-                        <tr><td colspan="5" class="p-4 text-center text-slate-400">Syncing submission logs...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8">
+            <h3 class="text-lg font-bold text-indigo-600 mb-4">Recent Exam Submissions</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                            <th class="pb-3">Student</th>
+                            <th class="pb-3">Exam</th>
+                            <th class="pb-3">Score</th>
+                            <th class="pb-3">Status</th>
+                            <th class="pb-3">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="submissions-table-body" class="text-slate-600 text-sm divide-y divide-slate-100">
+                        <tr><td colspan="5" class="py-4 text-center text-slate-400">Syncing submission logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-        <section class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-            <h3 class="text-lg font-bold text-slate-800 mb-4">Live User Accounts</h3>
-            <div class="overflow-x-auto rounded-xl border border-slate-100">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-200 text-slate-400 text-xs font-bold uppercase tracking-wider">
-                            <th class="p-4 py-3">Node ID</th>
-                            <th class="p-4 py-3">Full Name Field</th>
-                            <th class="p-4 py-3">Email Identity</th>
-                            <th class="p-4 py-3">Role</th>
-                        </tr>
-                    </thead>
-                    <tbody id="users-table-body" class="text-slate-600 text-sm divide-y divide-slate-100 bg-white"></tbody>
-                </table>
-            </div>
-        </section>
-    </main>
+        <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <h3 class="text-lg font-bold text-slate-800 mb-4">Live User Accounts</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-400 text-sm font-medium">
+                            <th class="pb-3">Node ID</th>
+                            <th class="pb-3">Full Name Field</th>
+                            <th class="pb-3">Email Identity</th>
+                            <th class="pb-3">Role</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body" class="text-slate-600 text-sm divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
 
-    <script>
-        document.getElementById('admin-display-name').textContent = localStorage.getItem('user_name') || 'Admin';
-        const databaseRoot = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app";
+    <script>
+        document.getElementById('admin-display-name').textContent = localStorage.getItem('user_name') || 'Admin';
+        const databaseRoot = "https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app";
 
-        async function initDashboardData() {
-            try {
-                // Fetch Core Nodes
-                const [resUsers, resExams, resResults] = await Promise.all([
-                    fetch(`${databaseRoot}/Users.json`),
-                    fetch(`${databaseRoot}/Exams.json`),
-                    fetch(`${databaseRoot}/Results.json`)
-                ]);
+        async function initDashboardData() {
+            try {
+                // Fetch Core Nodes
+                const [resUsers, resExams, resResults] = await Promise.all([
+                    fetch(`${databaseRoot}/Users.json`),
+                    fetch(`${databaseRoot}/Exams.json`),
+                    fetch(`${databaseRoot}/Results.json`)
+                ]);
 
-                const users = await resUsers.json() || {};
-                const exams = await resExams.json() || {};
-                const results = await resResults.json() || {};
+                const users = await resUsers.json() || {};
+                const exams = await resExams.json() || {};
+                const results = await resResults.json() || {};
 
-                document.getElementById('stat-users').textContent = Object.keys(users).length;
-                document.getElementById('stat-exams').textContent = Object.keys(exams).length;
+                document.getElementById('stat-users').textContent = Object.keys(users).length;
+                document.getElementById('stat-exams').textContent = Object.keys(exams).length;
 
-                // Render Submissions Table
-                const subBody = document.getElementById('submissions-table-body');
-                subBody.innerHTML = '';
-                
-                if (Object.keys(results).length > 0) {
-                    for (const [key, record] of Object.entries(results)) {
-                        const statusClass = record.status === "PASSED" 
-                            ? "bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-md text-xs font-bold" 
-                            : "bg-red-100 text-red-800 px-2 py-0.5 rounded-md text-xs font-bold";
+                // Render Submissions Table
+                const subBody = document.getElementById('submissions-table-body');
+                subBody.innerHTML = '';
+                
+                if (Object.keys(results).length > 0) {
+                    for (const [key, record] of Object.entries(results)) {
+                        const statusClass = record.status === "PASSED" 
+                            ? "bg-emerald-100 text-emerald-700 px-2.5 py-0.5 rounded text-xs font-bold" 
+                            : "bg-red-100 text-red-700 px-2.5 py-0.5 rounded text-xs font-bold";
 
-                        subBody.innerHTML += `
-                            <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 py-3.5 font-medium text-slate-800">${record.student_name}</td>
-                                <td class="p-4 py-3.5 text-slate-500">${record.exam_title}</td>
-                                <td class="p-4 py-3.5 font-bold text-slate-800">${record.score_raw}/${record.total_questions}</td>
-                                <td class="p-4 py-3.5"><span class="${statusClass}">${record.status}</span></td>
-                                <td class="p-4 py-3.5 text-slate-400 text-xs">${record.submitted_at || 'Recent'}</td>
-                            </tr>
-                        `;
-                    }
-                } else {
-                    subBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-400">No student attempts recorded yet.</td></tr>`;
-                }
-
-                // Render Accounts Table
-                const userBody = document.getElementById('users-table-body');
-                userBody.innerHTML = '';
-                
-                for (const [nodeId, info] of Object.entries(users)) {
-                    const isAdmin = info.role === 'admin';
-                    const rowClass = isAdmin ? "bg-amber-50/70 hover:bg-amber-50" : "hover:bg-slate-50 transition-colors";
-                    const badgeClass = isAdmin ? "text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded text-xs font-semibold" : "text-slate-400";
-
-                    userBody.innerHTML += `
-                        <tr class="${rowClass}">
-                            <td class="p-4 py-3.5 font-mono text-xs font-semibold text-indigo-600">${nodeId}</td>
-                            <td class="p-4 py-3.5 font-medium text-slate-800">${info['Full name'] || info['name'] || 'N/A'}</td>
-                            <td class="p-4 py-3.5 text-slate-500">${info.email || 'N/A'}</td>
-                            <td class="p-4 py-3.5 text-xs font-bold uppercase tracking-wider">
-                                <span class="${badgeClass}">${info.role || 'student'}</span>
-                            </td>
-                        </tr>
-                    `;
+                        subBody.innerHTML += `
+                            <tr>
+                                <td class="py-3.5 font-medium text-slate-800">${record.student_name}</td>
+                                <td class="py-3.5 text-slate-500">${record.exam_title}</td>
+                                <td class="py-3.5 font-bold text-slate-800">${record.score_raw}/${record.total_questions}</td>
+                                <td class="py-3.5"><span class="${statusClass}">${record.status}</span></td>
+                                <td class="py-3.5 text-slate-400 text-xs">${record.submitted_at || 'Recent'}</td>
+                            </tr>
+                        `;
+                    }
+                } else {
+                    subBody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-slate-400">No student attempts recorded yet.</td></tr>`;
                 }
-            } catch (e) { console.error("Database connection fault:", e); }
-        }
 
-        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
-        initDashboardData();
-    </script>
+                // Render Accounts Table
+                const userBody = document.getElementById('users-table-body');
+                userBody.innerHTML = '';
+                // Inside initDashboardData() for user loop
+for (const [nodeId, info] of Object.entries(users)) {
+    const isAdmin = info.role === 'admin';
+    const rowClass = isAdmin ? "bg-amber-50" : ""; // Highlight admins in amber
+    
+    userBody.innerHTML += `
+        <tr class="${rowClass}">
+            <td class="py-3.5 font-mono text-xs font-semibold text-indigo-600">${nodeId}</td>
+            <td class="py-3.5 font-medium text-slate-800">${info['Full name'] || info['name'] || 'N/A'}</td>
+            <td class="py-3.5 text-slate-500">${info.email || 'N/A'}</td>
+            <td class="py-3.5 text-xs font-bold uppercase tracking-wider ${isAdmin ? 'text-amber-600' : 'text-slate-400'}">
+                ${info.role || 'student'}
+            </td>
+        </tr>
+    `;
+}
+            } catch (e) { console.error("Database connection fault:", e); }
+        }
+
+        function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+        initDashboardData();
+    </script>
 </body>
 </html>
