@@ -5,11 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Portal - Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Modern aesthetic enhancements using regular CSS */
+        body {
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%),
+                linear-gradient(to bottom right, #f8fafc, #e2e8f0);
+            background-attachment: fixed;
+        }
+
+        /* Glassmorphism card refinement */
+        .auth-card {
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+                0 20px 25px -5px rgba(0, 0, 0, 0.05),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Header Accent */
+        .portal-header::before {
+            content: "🎓";
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 4px 6px rgba(99, 102, 241, 0.2));
+        }
+
+        /* Form input enhancements */
+        input[type="email"], input[type="password"] {
+            background-color: rgba(248, 250, 252, 0.7) !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        input[type="email"]:focus, input[type="password"]:focus {
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+            transform: translateY(-1px);
+        }
+
+        /* Button micro-interactions */
+        button[type="submit"] {
+            background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+        }
+
+        button[type="submit"]:hover {
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35) !important;
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2) !important;
+        }
+
+        /* Labels styling */
+        label {
+            font-size: 0.75rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600 !important;
+            color: #475569 !important;
+        }
+
+        /* Error box attention grabber */
+        #error-box {
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-8px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
-        <div class="text-center mb-8">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100 auth-card">
+        <div class="text-center mb-8 portal-header">
             <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Student Portal</h1>
             <p class="text-slate-500 mt-2">Sign in to your account</p>
         </div>
