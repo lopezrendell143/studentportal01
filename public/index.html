@@ -139,7 +139,6 @@
         let runningInterval = null;
         let aiModelsReady = false;
 
-        // Toggle UI states smoothly between text input and camera capture views
         function switchMode(mode) {
             errorBox.classList.add('hidden');
             stopFaceAuth();
@@ -178,7 +177,6 @@
             }
         });
 
-        // Utility helper to keep node transformations identical across systems
         function getNodeMapping(email) {
             if (email === "admin@gmail.com") return "admin01";
             if (email === "rendell@gmail.com") return "student01";
@@ -220,19 +218,25 @@
                     await faceapi.nets.faceRecognitionNet.loadFromUri('./assets/models/');
                     aiModelsReady = true;
                 }
+            } catch (modelErr) {
+                console.error(modelErr);
+                statusBox.classList.add('hidden');
+                showError("AI Models failed to load! Check your ./assets/models/ folder files.");
+                return;
+            }
 
+            try {
                 statusText.innerText = "Activating webcam lens...";
                 cameraStream = await navigator.mediaDevices.getUserMedia({ video: {} });
                 video.srcObject = cameraStream;
 
                 statusText.innerText = "Scanning facial landmarks...";
-                // Scan frames consistently every 2.5 seconds to preserve browser memory
                 runningInterval = setInterval(scanFrameAndMatch, 2500);
 
-            } catch (err) {
-                console.error(err);
+            } catch (camErr) {
+                console.error(camErr);
                 statusBox.classList.add('hidden');
-                showError("Camera access denied or model paths missing inside assets/models/.");
+                showError("Camera Access Denied! Please allow camera permissions in your browser settings.");
             }
         }
 
@@ -241,13 +245,12 @@
                 .withFaceLandmarks()
                 .withFaceDescriptor();
 
-            if (!detection) return; // Carry forward silently if user is off-frame
+            if (!detection) return;
 
             const liveDescriptor = detection.descriptor;
             statusText.innerText = "Matching signatures...";
 
             try {
-                // Read the whole /Users root path to grab all profiles at once
                 const res = await fetch(`https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users.json`);
                 const allUsers = await res.json();
 
@@ -257,16 +260,13 @@
                     const profile = allUsers[nodeKey];
 
                     if (profile && profile.face_descriptor) {
-                        // Cast text strings back into arrays
                         const savedDescriptorArray = new Float32Array(profile.face_descriptor.split(','));
                         const matchDistance = faceapi.euclideanDistance(liveDescriptor, savedDescriptorArray);
 
-                        // Threshold index lower than 0.55 marks a successful identity match
                         if (matchDistance < 0.55) {
                             statusText.innerText = "Access Granted! Loading session...";
                             statusBox.className = "bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center mb-5 border border-green-100 font-bold";
                             
-                            // Re-apply matching storage sessions
                             localStorage.setItem('user_email', profile.email || '');
                             localStorage.setItem('user_name', profile['Full name'] || profile['name'] || "User");
                             
