@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Modern aesthetic enhancements using regular CSS */
         body {
             background-image: 
                 radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
@@ -14,57 +15,121 @@
                 linear-gradient(to bottom right, #f8fafc, #e2e8f0);
             background-attachment: fixed;
         }
+
+        /* Glassmorphism card refinement */
         .auth-card {
             background: rgba(255, 255, 255, 0.85) !important;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.6) !important;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.05), 
+                0 20px 25px -5px rgba(0, 0, 0, 0.05),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.5);
         }
-        button.btn-primary {
+
+        /* Header Accent */
+        .portal-header::before {
+            content: "🎓";
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 4px 6px rgba(99, 102, 241, 0.2));
+        }
+
+        /* Form input enhancements */
+        input[type="email"], input[type="password"] {
+            background-color: rgba(248, 250, 252, 0.7) !important;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        input[type="email"]:focus, input[type="password"]:focus {
+            background-color: #ffffff !important;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
+            transform: translateY(-1px);
+        }
+
+        /* Button micro-interactions */
+        button[type="submit"] {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
+        }
+
+        button[type="submit"]:hover {
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35) !important;
+            transform: translateY(-1px);
+            filter: brightness(1.05);
+        }
+
+        button[type="submit"]:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 6px rgba(79, 70, 229, 0.2) !important;
+        }
+
+        /* Labels styling */
+        label {
+            font-size: 0.75rem !important;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600 !important;
+            color: #475569 !important;
+        }
+
+        /* Error box attention grabber */
+        #error-box {
+            animation: slideIn 0.3s ease-out;
+            box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-8px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
 
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100 auth-card">
-        <div class="text-center mb-6">
+        <div class="text-center mb-8 portal-header">
             <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Student Portal</h1>
-            <p class="text-slate-500 mt-1">Sign in to your account</p>
+            <p class="text-slate-500 mt-2">Sign in to your account</p>
         </div>
 
         <div class="flex p-1 bg-slate-100 rounded-xl mb-6 text-sm font-medium">
-            <button id="tab-pass" class="w-full py-2 rounded-lg text-indigo-600 bg-white shadow-sm" onclick="switchMode('pass')">
+            <button id="tab-pass" class="w-full py-2 rounded-lg text-indigo-600 bg-white shadow-sm transition-all" onclick="switchMode('pass')">
                 <i class="fas fa-keyboard me-1"></i> Password
             </button>
-            <button id="tab-face" class="w-full py-2 rounded-lg text-slate-600 hover:text-slate-900" onclick="switchMode('face')">
+            <button id="tab-face" class="w-full py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all" onclick="switchMode('face')">
                 <i class="fas fa-user-shield me-1"></i> Face ID
             </button>
         </div>
 
         <div id="error-box" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center mb-5 border border-red-100"></div>
+        
         <div id="status-box" class="hidden bg-indigo-50 text-indigo-600 p-3 rounded-lg text-sm text-center mb-5 border border-indigo-100">
-            <i class="fas fa-circle-notch fa-spin me-2"></i><span id="status-text">Initializing Camera...</span>
+            <i class="fas fa-circle-notch fa-spin me-2"></i><span id="status-text">Loading Face ID Engine...</span>
         </div>
 
         <form id="login-form" class="space-y-5">
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                <input type="email" id="email" required placeholder="yourname@gmail.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 outline-none">
+                <input type="email" id="email" required placeholder="JuanTamad@gmail.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 outline-none">
+                <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
             </div>
-            <button type="submit" class="w-full btn-primary text-white font-medium py-2.5 rounded-lg shadow-lg">Sign In</button>
+            <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-lg transition-colors shadow-lg shadow-indigo-100">
+                Sign In
+            </button>
         </form>
 
         <div id="camera-container" class="hidden text-center">
-            <div class="relative w-full h-60 bg-black rounded-xl overflow-hidden border border-slate-200 mb-2">
+            <div class="relative w-full h-64 bg-black rounded-xl overflow-hidden border border-slate-200 shadow-inner mb-3">
                 <video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
             </div>
-            <p class="text-xs text-slate-400">Position your face directly inside the camera window</p>
+            <p class="text-xs text-slate-400">Position your face directly inside the camera frame</p>
         </div>
     </div>
 
@@ -80,50 +145,63 @@
         const tabFace = document.getElementById('tab-face');
 
         let cameraStream = null;
-        let runningInterval = null;
-        let aiModelsReady = false;
+        let detectionInterval = null;
+        let modelsLoaded = false;
 
+        // Handles swapping elements when shifting between Password forms and Camera views
         function switchMode(mode) {
             errorBox.classList.add('hidden');
-            stopFaceAuth();
+            stopFaceAuthentication();
+            
             if (mode === 'pass') {
-                tabPass.className = "w-full py-2 rounded-lg text-indigo-600 bg-white shadow-sm";
-                tabFace.className = "w-full py-2 rounded-lg text-slate-600 hover:text-slate-900";
+                tabPass.className = "w-full py-2 rounded-lg text-indigo-600 bg-white shadow-sm transition-all";
+                tabFace.className = "w-full py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all";
                 loginForm.classList.remove('hidden');
                 cameraContainer.classList.add('hidden');
                 statusBox.classList.add('hidden');
             } else {
-                tabFace.className = "w-full py-2 rounded-lg text-indigo-600 bg-white shadow-sm";
-                tabPass.className = "w-full py-2 rounded-lg text-slate-600 hover:text-slate-900";
+                tabFace.className = "w-full py-2 rounded-lg text-indigo-600 bg-white shadow-sm transition-all";
+                tabPass.className = "w-full py-2 rounded-lg text-slate-600 hover:text-slate-900 transition-all";
                 loginForm.classList.add('hidden');
                 cameraContainer.classList.remove('hidden');
-                startFaceAuth();
+                startFaceAuthentication();
             }
         }
 
-        // --- PASSWORD LOGIN LOGIC ---
-        loginForm.addEventListener('submit', async function(e) {
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
             const emailInput = document.getElementById('email').value.trim();
             const passwordInput = document.getElementById('password').value.trim();
+            
             errorBox.classList.add('hidden');
 
-            let userNode = "student_" + emailInput.replace(/[\.@]/g, '_');
-            if (emailInput === "admin@gmail.com") userNode = "admin01";
-            if (emailInput === "rendell@gmail.com") userNode = "student01";
+            // Determine the Firebase key mapping
+            let userNode = "";
+            if (emailInput === "admin@gmail.com") {
+                userNode = "admin01";
+            } else if (emailInput === "rendell@gmail.com") {
+                userNode = "student01";
+            } else {
+                // Matches the auto-generated structure for newly created students
+                userNode = "student_" + emailInput.replace(/[\.@]/g, '_');
+            }
 
-            const url = `https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/Users/${userNode}.json`;
+            // Your exact Singapore database URL targeting the specific node
+            const url = `https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users/${userNode}.json`;
 
             try {
                 const response = await fetch(url);
                 const userData = await response.json();
-                
+
                 if (userData && userData.password === passwordInput) {
-                    // IMPORTANT: Save the logged-in student's node identifier key for registration tracking
+                    // ADDED: Saves user_node details to handle dashboard profile linking checks
                     localStorage.setItem('user_node', userNode);
+                    // Store user session variables locally in the browser
                     localStorage.setItem('user_email', emailInput);
-                    localStorage.setItem('user_name', userData['Full name'] || userData['name'] || "Student");
+                    localStorage.setItem('user_name', userData['Full name'] || userData['name'] || "User");
                     
+                    // Route user roles based on node signature
                     if (userNode.includes('admin')) {
                         localStorage.setItem('user_role', 'admin');
                         window.location.href = 'admin_dashboard.html';
@@ -132,83 +210,100 @@
                         window.location.href = 'student_dashboard.html';
                     }
                 } else {
-                    showError("Invalid email or password credentials.");
+                    errorBox.textContent = "Invalid email or password.";
+                    errorBox.classList.remove('hidden');
                 }
             } catch (error) {
-                showError("Error connecting to account servers.");
+                errorBox.textContent = "Error connecting to Firebase Realtime Database.";
+                errorBox.classList.remove('hidden');
+                console.error(error);
             }
         });
 
-        // --- FACE ID LOGIN MATCHING ENGINE ---
-        async function startFaceAuth() {
+        // --- ADDED: BIOMETRIC RECOGNITION LOOPS ---
+        async function startFaceAuthentication() {
             statusBox.classList.remove('hidden');
-            statusText.innerText = "Connecting to AI core structures...";
+            statusText.innerText = "Loading AI models from CDN network...";
+            
             const MODEL_URL = 'https://raw.githubusercontent.com/Neet-0/face-api-models/main/';
 
             try {
-                if (!aiModelsReady) {
+                if (!modelsLoaded) {
                     await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
                     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
                     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
-                    aiModelsReady = true;
+                    modelsLoaded = true;
                 }
             } catch (err) {
                 statusBox.classList.add('hidden');
-                showError("Failed to initiate facial biometric files.");
+                showErrorText("AI models failed to configure. Check system console.");
                 return;
             }
 
             try {
+                statusText.innerText = "Starting hardware camera...";
                 cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
                 video.srcObject = cameraStream;
-                statusText.innerText = "Analyzing live camera feeds...";
-                runningInterval = setInterval(scanAndMatch, 2000);
+                statusText.innerText = "Scanning facial biometrics...";
+                
+                detectionInterval = setInterval(executeBiometricVerification, 2000);
             } catch (err) {
                 statusBox.classList.add('hidden');
-                showError("Camera Access Blocked! Enable browser camera access.");
+                showErrorText("Camera access blocked. Reset browser privacy permissions.");
             }
         }
 
-        async function scanAndMatch() {
-            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
-            if (!detection) return;
+        async function executeBiometricVerification() {
+            const liveDetection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+            if (!liveDetection) return;
 
-            statusText.innerText = "Verifying biometric database records...";
+            statusText.innerText = "Matching records...";
+            
             try {
-                const res = await fetch(`https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/Users.json`);
+                const res = await fetch(`https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users.json`);
                 const allUsers = await res.json();
 
-                for (let key in allUsers) {
-                    if (allUsers[key].face_descriptor) {
-                        const savedWeights = new Float32Array(allUsers[key].face_descriptor.split(','));
-                        const distance = faceapi.euclideanDistance(detection.descriptor, savedWeights);
+                for (let uniqueNodeKey in allUsers) {
+                    const userProfile = allUsers[uniqueNodeKey];
+                    
+                    if (userProfile && userProfile.face_descriptor) {
+                        const savedDescriptorWeights = new Float32Array(userProfile.face_descriptor.split(','));
+                        const distance = faceapi.euclideanDistance(liveDetection.descriptor, savedDescriptorWeights);
 
                         if (distance < 0.55) {
                             statusText.innerText = "Access Approved! Redirecting...";
-                            stopFaceAuth();
+                            stopFaceAuthentication();
                             
-                            localStorage.setItem('user_node', key);
-                            localStorage.setItem('user_email', allUsers[key].email || '');
-                            localStorage.setItem('user_name', allUsers[key]['Full name'] || allUsers[key]['name'] || "Student");
+                            localStorage.setItem('user_node', uniqueNodeKey);
+                            localStorage.setItem('user_email', userProfile.email || '');
+                            localStorage.setItem('user_name', userProfile['Full name'] || userProfile['name'] || "User");
                             
-                            if (key.includes('admin')) {
+                            if (uniqueNodeKey.includes('admin')) {
+                                localStorage.setItem('user_role', 'admin');
                                 window.location.href = 'admin_dashboard.html';
                             } else {
+                                localStorage.setItem('user_role', 'student');
                                 window.location.href = 'student_dashboard.html';
                             }
                             return;
                         }
                     }
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error(e);
+            }
         }
 
-        function stopFaceAuth() {
-            if (runningInterval) clearInterval(runningInterval);
-            if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
+        function stopFaceAuthentication() {
+            if (detectionInterval) clearInterval(detectionInterval);
+            if (cameraStream) cameraStream.getTracks().forEach(track => track.stop());
             video.srcObject = null;
         }
-        function showError(msg) { errorBox.textContent = msg; errorBox.classList.remove('hidden'); }
+
+        function showErrorText(msg) {
+            errorBox.textContent = msg;
+            errorBox.classList.remove('hidden');
+        }
     </script>
 </body>
 </html>
