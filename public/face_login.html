@@ -36,39 +36,38 @@
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
 <script>
-    // 1. Initialize Firebase database with the correct database path
+    // 1. Initialize Firebase database using your authorized bypass key
     const firebaseConfig = {
         databaseURL: "https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/"
     };
     firebase.initializeApp(firebaseConfig);
-    
-    // FIX 1: Updated the database reference with your actual Secret Auth token seen in firebase_helper.php
-    const db = firebase.database().app.database("https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/?auth=LorrhK8Tnsbziwce0NNjpDNZcpTUoECPdiLcaZkQ");
+    const db = firebase.database().app.database("https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/?auth=LorrhK8Tnsbziwce0NNjpDNZcpTUoECPdiLcaZkQ"); // cite: image_2f7ced.jpg
 
     const video = document.getElementById('video');
     const statusText = document.getElementById('status');
     let registeredUsers = {};
 
-    // 2. Load Models locally from your assets folder
+    // 2. Load Models directly from an open-source CDN hosting the face-api weights
     async function init() {
         try {
-            statusText.innerText = "Loading AI Models...";
+            statusText.innerText = "Loading AI Models from CDN...";
             
-            // FIX 2: Removed the leading '.' so Firebase Hosting resolves the model paths smoothly from root
-            await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models/');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models/');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models/');
+            // This public CDN directory hosts the required manifest files and model shards cleanly with open CORS rules
+            const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/weights/'; // cite: face-api.js/weights/face_recognition_model-shard2 at master · justadudewhohacks/face-api.js · GitHub
+            
+            await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+            await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
 
             statusText.innerText = "Fetching student keys...";
             
-            // FIX 3: Changed 'users' to capitalized 'Users' to match your actual Firebase path layout
-            db.ref('Users').once('value', (snapshot) => {
+            db.ref('Users').once('value', (snapshot) => { // cite: image_2f7ced.jpg
                 registeredUsers = snapshot.val() || {};
                 startVideo();
             });
         } catch (e) {
-            console.error(e);
-            statusText.innerText = "Error loading models. Verify shard files exist in assets/models/.";
+            console.error("Model Engine Error:", e);
+            statusText.innerText = "Error loading models directly from CDN link. Check connection console.";
             statusText.className = "alert alert-danger py-2 small";
         }
     }

@@ -206,41 +206,41 @@
         }
 
         // --- METHOD 2: Continuous Face ID Tracking Engine ---
-        // --- METHOD 2: Continuous Face ID Tracking Engine ---
-// --- METHOD 2: Continuous Face ID Tracking Engine ---
-            async function startFaceAuth() {
-                statusBox.classList.remove('hidden');
-                statusText.innerText = "Loading AI models...";
+        async function startFaceAuth() {
+            statusBox.classList.remove('hidden');
+            statusText.innerText = "Loading AI models from CDN...";
 
-                try {
-                    if (!aiModelsReady) {
-                        // Using absolute root paths tells the browser exactly where to look on the server
-                        await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models');
-                        await faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models');
-                        await faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models');
-                        aiModelsReady = true;
-                    }
-                } catch (modelErr) {
-                    console.error("Model Loading Error details:", modelErr);
-                    statusBox.classList.add('hidden');
-                    showError("AI Models failed to load! Check your /assets/models/ folder files.");
-                    return;
+            try {
+                if (!aiModelsReady) {
+                    // Points directly to the open-source CDN bypass URL
+                    const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/weights/';
+                    
+                    await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
+                    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
+                    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
+                    aiModelsReady = true;
                 }
-
-                try {
-                    statusText.innerText = "Activating webcam lens...";
-                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: {} });
-                    video.srcObject = cameraStream;
-
-                    statusText.innerText = "Scanning facial landmarks...";
-                    runningInterval = setInterval(scanFrameAndMatch, 2500);
-
-                } catch (camErr) {
-                    console.error(camErr);
-                    statusBox.classList.add('hidden');
-                    showError("Camera Access Denied! Please allow camera permissions in your browser settings.");
-                }
+            } catch (modelErr) {
+                console.error(modelErr);
+                statusBox.classList.add('hidden');
+                showError("AI Models failed to load from CDN! Check internet connection or console.");
+                return;
             }
+
+            try {
+                statusText.innerText = "Activating webcam lens...";
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                video.srcObject = cameraStream;
+
+                statusText.innerText = "Scanning facial landmarks...";
+                runningInterval = setInterval(scanFrameAndMatch, 2500);
+
+            } catch (camErr) {
+                console.error(camErr);
+                statusBox.classList.add('hidden');
+                showError("Camera Access Denied! Please allow camera permissions in your browser settings.");
+            }
+        }
 
         async function scanFrameAndMatch() {
             const detection = await faceapi.detectSingleFace(video)
