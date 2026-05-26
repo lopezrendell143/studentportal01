@@ -91,7 +91,7 @@
                 <i class="fas fa-keyboard me-1"></i> Password
             </button>
             <button id="tab-face" class="w-full py-2 rounded-lg text-slate-600 hover:text-slate-900" onclick="switchMode('face')">
-                <i class="fas fa-face-recognition me-1"></i> Face ID
+                <i class="fas fa-user-shield me-1"></i> Face ID
             </button>
         </div>
 
@@ -158,7 +158,7 @@
             }
         }
 
-        // --- METHOD 1: Standard Credentials Handling ---
+        // --- PASSWORD LOGIN LOGIC ---
         loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const emailInput = document.getElementById('email').value.trim();
@@ -166,7 +166,7 @@
             errorBox.classList.add('hidden');
 
             let userNode = getNodeMapping(emailInput);
-            const url = `https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users/${userNode}.json`;
+            const url = `https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/Users/${userNode}.json`;
 
             try {
                 const response = await fetch(url);
@@ -205,14 +205,15 @@
             errorBox.classList.remove('hidden');
         }
 
-        // --- METHOD 2: Continuous Face ID Tracking Engine ---
+        // --- FACE ID LOGIC ---
         async function startFaceAuth() {
+            errorBox.classList.add('hidden');
             statusBox.classList.remove('hidden');
             statusText.innerText = "Loading AI models from CDN...";
 
             try {
                 if (!aiModelsReady) {
-                    // Points directly to the open-source CDN bypass URL
+                    // FIXED: Explicitly added the necessary trailing slash / at the end
                     const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/weights/';
                     
                     await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
@@ -223,22 +224,28 @@
             } catch (modelErr) {
                 console.error(modelErr);
                 statusBox.classList.add('hidden');
-                showError("AI Models failed to load from CDN! Check internet connection or console.");
+                showError("AI Models failed to load! Please check your internet connection.");
                 return;
             }
 
+            // CAMERA ACCESS HANDLER
             try {
-                statusText.innerText = "Activating webcam lens...";
-                cameraStream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                statusText.innerText = "Requesting camera access permissions...";
+                
+                // This triggers the native browser pop-up window asking for permission
+                cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { width: 640, height: 480, facingMode: "user" } 
+                });
+                
                 video.srcObject = cameraStream;
-
                 statusText.innerText = "Scanning facial landmarks...";
                 runningInterval = setInterval(scanFrameAndMatch, 2500);
 
             } catch (camErr) {
                 console.error(camErr);
                 statusBox.classList.add('hidden');
-                showError("Camera Access Denied! Please allow camera permissions in your browser settings.");
+                // Informative alert message showing how to re-grant blocked credentials
+                showError("Camera Access Blocked! Click the camera icon in your browser address bar to allow permissions.");
             }
         }
 
@@ -253,7 +260,7 @@
             statusText.innerText = "Matching signatures...";
 
             try {
-                const res = await fetch(`https://studentportal01-9ddef-default-rtdb.asia-southeast1.firebasedatabase.app/Users.json`);
+                const res = await fetch(`https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/Users.json`);
                 const allUsers = await res.json();
 
                 if (!allUsers) return;
@@ -286,7 +293,7 @@
                     }
                 }
             } catch (err) {
-                console.error("Database mismatch execution error: ", err);
+                console.error("Database connection error: ", err);
             }
         }
 
