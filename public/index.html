@@ -14,74 +14,22 @@
                 linear-gradient(to bottom right, #f8fafc, #e2e8f0);
             background-attachment: fixed;
         }
-
         .auth-card {
             background: rgba(255, 255, 255, 0.85) !important;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.6) !important;
-            box-shadow: 
-                0 4px 6px -1px rgba(0, 0, 0, 0.05), 
-                0 20px 25px -5px rgba(0, 0, 0, 0.05),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.05);
         }
-
-        .portal-header::before {
-            content: "🎓";
-            display: block;
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-            filter: drop-shadow(0 4px 6px rgba(99, 102, 241, 0.2));
-        }
-
-        input[type="email"], input[type="password"] {
-            background-color: rgba(248, 250, 252, 0.7) !important;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-
-        input[type="email"]:focus, input[type="password"]:focus {
-            background-color: #ffffff !important;
-            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15) !important;
-            transform: translateY(-1px);
-        }
-
-        button {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        }
-
         button.btn-primary {
             background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%) !important;
-            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25) !important;
-        }
-
-        button.btn-primary:hover {
-            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35) !important;
-            transform: translateY(-1px);
-            filter: brightness(1.05);
-        }
-
-        label {
-            font-size: 0.75rem !important;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600 !important;
-            color: #475569 !important;
-        }
-
-        #error-box, #status-box {
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-8px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
 
     <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100 auth-card">
-        <div class="text-center mb-6 portal-header">
+        <div class="text-center mb-6">
             <h1 class="text-3xl font-bold text-slate-800 tracking-tight">Student Portal</h1>
             <p class="text-slate-500 mt-1">Sign in to your account</p>
         </div>
@@ -103,27 +51,24 @@
         <form id="login-form" class="space-y-5">
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
-                <input type="email" id="email" required placeholder="JuanTamad@gmail.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                <input type="email" id="email" required placeholder="yourname@gmail.com" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 outline-none">
             </div>
             <div>
                 <label class="block text-sm font-medium text-slate-700 mb-1">Password</label>
-                <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all">
+                <input type="password" id="password" required placeholder="••••••••" class="w-full px-4 py-2.5 rounded-lg border border-slate-300 outline-none">
             </div>
-            <button type="submit" class="w-full btn-primary text-white font-medium py-2.5 rounded-lg shadow-lg">
-                Sign In
-            </button>
+            <button type="submit" class="w-full btn-primary text-white font-medium py-2.5 rounded-lg shadow-lg">Sign In</button>
         </form>
 
         <div id="camera-container" class="hidden text-center">
-            <div class="relative w-full h-60 bg-black rounded-xl overflow-hidden border border-slate-200 shadow-inner mb-2">
+            <div class="relative w-full h-60 bg-black rounded-xl overflow-hidden border border-slate-200 mb-2">
                 <video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
             </div>
-            <p class="text-xs text-slate-400">Position your face directly in front of your camera frame</p>
+            <p class="text-xs text-slate-400">Position your face directly inside the camera window</p>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
-
     <script>
         const loginForm = document.getElementById('login-form');
         const cameraContainer = document.getElementById('camera-container');
@@ -131,7 +76,6 @@
         const statusBox = document.getElementById('status-box');
         const statusText = document.getElementById('status-text');
         const video = document.getElementById('video');
-
         const tabPass = document.getElementById('tab-pass');
         const tabFace = document.getElementById('tab-face');
 
@@ -142,7 +86,6 @@
         function switchMode(mode) {
             errorBox.classList.add('hidden');
             stopFaceAuth();
-
             if (mode === 'pass') {
                 tabPass.className = "w-full py-2 rounded-lg text-indigo-600 bg-white shadow-sm";
                 tabFace.className = "w-full py-2 rounded-lg text-slate-600 hover:text-slate-900";
@@ -165,144 +108,107 @@
             const passwordInput = document.getElementById('password').value.trim();
             errorBox.classList.add('hidden');
 
-            let userNode = getNodeMapping(emailInput);
+            let userNode = "student_" + emailInput.replace(/[\.@]/g, '_');
+            if (emailInput === "admin@gmail.com") userNode = "admin01";
+            if (emailInput === "rendell@gmail.com") userNode = "student01";
+
             const url = `https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/Users/${userNode}.json`;
 
             try {
                 const response = await fetch(url);
                 const userData = await response.json();
-                verifyAndLogin(userData, passwordInput, emailInput, userNode);
+                
+                if (userData && userData.password === passwordInput) {
+                    // IMPORTANT: Save the logged-in student's node identifier key for registration tracking
+                    localStorage.setItem('user_node', userNode);
+                    localStorage.setItem('user_email', emailInput);
+                    localStorage.setItem('user_name', userData['Full name'] || userData['name'] || "Student");
+                    
+                    if (userNode.includes('admin')) {
+                        localStorage.setItem('user_role', 'admin');
+                        window.location.href = 'admin_dashboard.html';
+                    } else {
+                        localStorage.setItem('user_role', 'student');
+                        window.location.href = 'student_dashboard.html';
+                    }
+                } else {
+                    showError("Invalid email or password credentials.");
+                }
             } catch (error) {
-                showError("Error connecting to Firebase Realtime Database.");
+                showError("Error connecting to account servers.");
             }
         });
 
-        function getNodeMapping(email) {
-            if (email === "admin@gmail.com") return "admin01";
-            if (email === "rendell@gmail.com") return "student01";
-            return "student_" + email.replace(/[\.@]/g, '_');
-        }
-
-        function verifyAndLogin(userData, typedPassword, email, node) {
-            if (userData && userData.password === typedPassword) {
-                localStorage.setItem('user_email', email);
-                localStorage.setItem('user_name', userData['Full name'] || userData['name'] || "User");
-                
-                if (node.includes('admin')) {
-                    localStorage.setItem('user_role', 'admin');
-                    window.location.href = 'admin_dashboard.html';
-                } else {
-                    localStorage.setItem('user_role', 'student');
-                    window.location.href = 'student_dashboard.html';
-                }
-            } else {
-                showError("Invalid email or password.");
-            }
-        }
-
-        function showError(msg) {
-            errorBox.textContent = msg;
-            errorBox.classList.remove('hidden');
-        }
-
-        // --- FACE ID LOGIC ---
+        // --- FACE ID LOGIN MATCHING ENGINE ---
         async function startFaceAuth() {
-            errorBox.classList.add('hidden');
             statusBox.classList.remove('hidden');
-            statusText.innerText = "Loading AI models from CDN server...";
+            statusText.innerText = "Connecting to AI core structures...";
+            const MODEL_URL = 'https://raw.githubusercontent.com/Neet-0/face-api-models/main/';
 
             try {
                 if (!aiModelsReady) {
-                    // CHANGED: Using a reliable, open CORS CDN hosting bucket specifically for face-api weights
-                    const MODEL_URL = 'https://raw.githubusercontent.com/Neet-0/face-api-models/main/';
-                    
                     await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
                     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
                     await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL);
                     aiModelsReady = true;
                 }
-            } catch (modelErr) {
-                console.error(modelErr);
+            } catch (err) {
                 statusBox.classList.add('hidden');
-                showError("AI Models failed to load! Please check your internet connection.");
+                showError("Failed to initiate facial biometric files.");
                 return;
             }
 
-            // CAMERA ACCESS HANDLER
             try {
-                statusText.innerText = "Requesting camera access permissions...";
-                
-                cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { width: 640, height: 480, facingMode: "user" } 
-                });
-                
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
                 video.srcObject = cameraStream;
-                statusText.innerText = "Scanning facial landmarks...";
-                runningInterval = setInterval(scanFrameAndMatch, 2500);
-
-            } catch (camErr) {
-                console.error(camErr);
+                statusText.innerText = "Analyzing live camera feeds...";
+                runningInterval = setInterval(scanAndMatch, 2000);
+            } catch (err) {
                 statusBox.classList.add('hidden');
-                showError("Camera Access Blocked! Click the camera icon in your browser address bar to allow permissions.");
+                showError("Camera Access Blocked! Enable browser camera access.");
             }
         }
 
-        async function scanFrameAndMatch() {
-            const detection = await faceapi.detectSingleFace(video)
-                .withFaceLandmarks()
-                .withFaceDescriptor();
-
+        async function scanAndMatch() {
+            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
             if (!detection) return;
 
-            const liveDescriptor = detection.descriptor;
-            statusText.innerText = "Matching signatures...";
-
+            statusText.innerText = "Verifying biometric database records...";
             try {
                 const res = await fetch(`https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/Users.json`);
                 const allUsers = await res.json();
 
-                if (!allUsers) return;
+                for (let key in allUsers) {
+                    if (allUsers[key].face_descriptor) {
+                        const savedWeights = new Float32Array(allUsers[key].face_descriptor.split(','));
+                        const distance = faceapi.euclideanDistance(detection.descriptor, savedWeights);
 
-                for (const nodeKey in allUsers) {
-                    const profile = allUsers[nodeKey];
-
-                    if (profile && profile.face_descriptor) {
-                        const savedDescriptorArray = new Float32Array(profile.face_descriptor.split(','));
-                        const matchDistance = faceapi.euclideanDistance(liveDescriptor, savedDescriptorArray);
-
-                        if (matchDistance < 0.55) {
-                            statusText.innerText = "Access Granted! Loading session...";
-                            statusBox.className = "bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center mb-5 border border-green-100 font-bold";
-                            
-                            localStorage.setItem('user_email', profile.email || '');
-                            localStorage.setItem('user_name', profile['Full name'] || profile['name'] || "User");
-                            
+                        if (distance < 0.55) {
+                            statusText.innerText = "Access Approved! Redirecting...";
                             stopFaceAuth();
-
-                            if (nodeKey.includes('admin')) {
-                                localStorage.setItem('user_role', 'admin');
+                            
+                            localStorage.setItem('user_node', key);
+                            localStorage.setItem('user_email', allUsers[key].email || '');
+                            localStorage.setItem('user_name', allUsers[key]['Full name'] || allUsers[key]['name'] || "Student");
+                            
+                            if (key.includes('admin')) {
                                 window.location.href = 'admin_dashboard.html';
                             } else {
-                                localStorage.setItem('user_role', 'student');
                                 window.location.href = 'student_dashboard.html';
                             }
                             return;
                         }
                     }
                 }
-            } catch (err) {
-                console.error("Database connection error: ", err);
-            }
+            } catch (e) { console.error(e); }
         }
 
         function stopFaceAuth() {
-            if (runningInterval) { clearInterval(runningInterval); runningInterval = null; }
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
+            if (runningInterval) clearInterval(runningInterval);
+            if (cameraStream) cameraStream.getTracks().forEach(t => t.stop());
             video.srcObject = null;
         }
+        function showError(msg) { errorBox.textContent = msg; errorBox.classList.remove('hidden'); }
     </script>
 </body>
 </html>
