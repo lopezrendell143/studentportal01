@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Management - Biometrics</title>
+    <title>Student Portal - Setup Face ID</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -14,43 +14,39 @@
                 linear-gradient(to bottom right, #f8fafc, #e2e8f0);
             background-attachment: fixed;
         }
-        .panel-card {
-            background: rgba(255, 255, 255, 0.85);
+        .auth-card {
+            background: rgba(255, 255, 255, 0.85) !important;
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.6) !important;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
         }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
 
-    <div class="p-8 rounded-2xl shadow-xl w-full max-w-md panel-card border border-slate-100 text-center">
-        <h1 class="text-2xl font-bold text-slate-800 tracking-tight mb-1">
-            <i class="fas fa-user-shield text-indigo-600 me-2"></i>Biometric Linker
-        </h1>
-        <p class="text-slate-500 text-sm mb-6">Manage Face ID registry nodes and class entry sessions</p>
-
-        <div id="error-box" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4 border border-red-100 text-center"></div>
-        <div id="status-box" class="bg-indigo-50 text-indigo-600 p-3 rounded-lg text-sm mb-4 border border-indigo-100 text-center">
-            <i class="fas fa-circle-notch fa-spin me-2"></i><span id="status-text">Booting Engine...</span>
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-slate-100 auth-card text-center">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Setup Face ID</h1>
+            <p class="text-slate-500 text-sm mt-1">Link your face for quick account login</p>
         </div>
 
-        <div class="relative w-full h-64 bg-black rounded-xl overflow-hidden border border-slate-200 shadow-inner mb-6">
+        <div id="error-box" class="hidden bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center mb-4 border border-red-100"></div>
+        <div id="status-box" class="bg-indigo-50 text-indigo-600 p-3 rounded-lg text-sm text-center mb-4 border border-indigo-100">
+            <i class="fas fa-circle-notch fa-spin me-2"></i><span id="status-text">Loading Face ID Systems...</span>
+        </div>
+
+        <div class="relative w-full h-64 bg-black rounded-xl overflow-hidden border border-slate-200 mb-4">
             <video id="video" class="w-full h-full object-cover" autoplay muted playsinline></video>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-            <button id="registerBtn" disabled class="w-full bg-slate-800 hover:bg-slate-900 text-white font-medium py-3 px-4 rounded-xl shadow transition-all disabled:opacity-50 text-sm">
-                <i class="fas fa-user-plus block text-lg mb-1"></i> Register Face
-            </button>
-            <button id="attendanceBtn" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-4 rounded-xl shadow transition-all disabled:opacity-50 text-sm">
-                <i class="fas fa-clipboard-user block text-lg mb-1"></i> Log Attendance
-            </button>
-        </div>
+        <button id="registerBtn" disabled class="w-full bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-2.5 rounded-lg transition-colors shadow-lg shadow-indigo-100">
+            Register My Face
+        </button>
 
         <div class="mt-6 border-t border-slate-200 pt-4">
-            <a href="admin_dashboard.html" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium text-decoration-none">
-                <i class="fas fa-arrow-left me-1"></i> Return to Main Admin Dashboard
+            <a href="student_dashboard.html" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium flex items-center justify-center gap-1">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
     </div>
