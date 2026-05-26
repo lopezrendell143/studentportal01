@@ -209,12 +209,12 @@
         async function startFaceAuth() {
             errorBox.classList.add('hidden');
             statusBox.classList.remove('hidden');
-            statusText.innerText = "Loading AI models from CDN...";
+            statusText.innerText = "Loading AI models from CDN server...";
 
             try {
                 if (!aiModelsReady) {
-                    // FIXED: Explicitly added the necessary trailing slash / at the end
-                    const MODEL_URL = 'https://justadudewhohacks.github.io/face-api.js/weights/';
+                    // CHANGED: Using a reliable, open CORS CDN hosting bucket specifically for face-api weights
+                    const MODEL_URL = 'https://raw.githubusercontent.com/Neet-0/face-api-models/main/';
                     
                     await faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL);
                     await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL);
@@ -232,7 +232,6 @@
             try {
                 statusText.innerText = "Requesting camera access permissions...";
                 
-                // This triggers the native browser pop-up window asking for permission
                 cameraStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { width: 640, height: 480, facingMode: "user" } 
                 });
@@ -244,7 +243,6 @@
             } catch (camErr) {
                 console.error(camErr);
                 statusBox.classList.add('hidden');
-                // Informative alert message showing how to re-grant blocked credentials
                 showError("Camera Access Blocked! Click the camera icon in your browser address bar to allow permissions.");
             }
         }
