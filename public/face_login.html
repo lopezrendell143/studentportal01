@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Facial Recognition Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -19,7 +20,7 @@
     <p class="text-muted small">Look into your camera to verify your student identity.</p>
 
     <div class="camera-box">
-        <video id="video" autoplay muted></video>
+        <video id="video" autoplay muted playsinline></video>
     </div>
 
     <div id="status" class="alert alert-info py-2 small">Loading AI Models...</div>
@@ -35,12 +36,14 @@
 <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
 
 <script>
-    // 1. Initialize Firebase database using your authorized bypass key
+    // 1. Initialize Firebase database with the correct database path
     const firebaseConfig = {
         databaseURL: "https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/"
     };
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.database().app.database("https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/?auth=LorrhK8T79G9h76Xw1b9BvYqCH77Wp8vYI9f3w9r");
+    
+    // FIX 1: Updated the database reference with your actual Secret Auth token seen in firebase_helper.php
+    const db = firebase.database().app.database("https://studentportal-fc3a9-default-rtdb.asia-southeast1.firebasedatabase.app/?auth=LorrhK8Tnsbziwce0NNjpDNZcpTUoECPdiLcaZkQ");
 
     const video = document.getElementById('video');
     const statusText = document.getElementById('status');
@@ -51,14 +54,15 @@
         try {
             statusText.innerText = "Loading AI Models...";
             
-            // Points directly to your studentportal01/public/assets/models/ folder layout
-            await faceapi.nets.ssdMobilenetv1.loadFromUri('./assets/models/');
-            await faceapi.nets.faceLandmark68Net.loadFromUri('./assets/models/');
-            await faceapi.nets.faceRecognitionNet.loadFromUri('./assets/models/');
+            // FIX 2: Removed the leading '.' so Firebase Hosting resolves the model paths smoothly from root
+            await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models/');
+            await faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models/');
+            await faceapi.nets.faceRecognitionNet.loadFromUri('/assets/models/');
 
             statusText.innerText = "Fetching student keys...";
             
-            db.ref('users').once('value', (snapshot) => {
+            // FIX 3: Changed 'users' to capitalized 'Users' to match your actual Firebase path layout
+            db.ref('Users').once('value', (snapshot) => {
                 registeredUsers = snapshot.val() || {};
                 startVideo();
             });
@@ -76,7 +80,6 @@
                 statusText.innerText = "System Ready! Scanning face...";
                 statusText.className = "alert alert-success py-2 small";
                 
-                // Scan every 2.5 seconds so it doesn't freeze your web browser
                 setInterval(checkFaceSignature, 2500);
             })
             .catch(err => {
@@ -90,24 +93,21 @@
             .withFaceLandmarks()
             .withFaceDescriptor();
 
-        if (!detection) return; // Keep scanning if no face is in camera view
+        if (!detection) return; 
 
         const currentDescriptor = detection.descriptor;
 
         for (const userId in registeredUsers) {
             const user = registeredUsers[userId];
             
-            // If the student has a registered face template array stored in Firebase
-            if (user.face_descriptor) {
+            if (user && user.face_descriptor) {
                 const savedDescriptorArray = new Float32Array(user.face_descriptor.split(','));
                 const distance = faceapi.euclideanDistance(currentDescriptor, savedDescriptorArray);
 
-                // Any distance score under 0.55 means a clear positive face match
                 if (distance < 0.55) {
                     statusText.innerText = "Match Verified! Logging in...";
                     statusText.className = "alert alert-success py-2 small fw-bold";
                     
-                    // Route directly to your backend biometric session bridge handler
                     window.location.href = `../includes/biometric_handler.php?token=${encodeURIComponent(userId)}&auth_type=face`;
                     return;
                 }
